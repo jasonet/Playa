@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  source-checks:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Verify Python sources
+        run: python3 -m py_compile PythonDistribution/Overlay/playa_server.py
+      - name: Run standalone configuration tests
+        run: swift scripts/test_cli_proxy_config.swift
+      - name: Verify public repository hygiene
+        run: scripts/verify_public_repository.sh

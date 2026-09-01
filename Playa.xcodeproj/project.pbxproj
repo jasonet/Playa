@@ -1,0 +1,792 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		008FB9DC05D768F90465C3CB /* MarkdownFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A4EAF4F2BC339FB01C73B13 /* MarkdownFormatting.swift */; };
+		0C76CDA372F0023223AD0C0F /* ModelDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224A92D73F8456D0B45ECF3D /* ModelDownloadManager.swift */; };
+		10EAF010A6F7E4651496F399 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7DE9605882AA9AA43BCDD584 /* Assets.xcassets */; };
+		2317BFEC1F303E8293EBF7B2 /* PlayaServerKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1EF4576F87E1F5817058087 /* PlayaServerKit.framework */; };
+		27073D8F62EF9FFF5EF08095 /* ModelProviderIcons in Resources */ = {isa = PBXBuildFile; fileRef = D9CBC2FC7B2D716AD52BA39A /* ModelProviderIcons */; };
+		2B5A1986FB63358AFFE5816F /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = A687E0430048ACF12D420B13 /* Textual */; };
+		2F041183B24CCBE86ABCB4E9 /* ChatConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC686B53E335E0053A7CC05 /* ChatConfigurationView.swift */; };
+		41C835312DD1344671D62493 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F0CB726E5C9799AE519AFD /* StatsView.swift */; };
+		4776A6811D83F1375ACFF445 /* PlayaImageClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B776E45404D84AA91B03C0F /* PlayaImageClient.swift */; };
+		52AF1E21034D02F2359AB521 /* GeminiOmniView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2C8DABB17ABE359F29972D0 /* GeminiOmniView.swift */; };
+		5395A8ABF53B53D3C7A039D7 /* PlayaServerKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = D122651671CC762B287EBB77 /* PlayaServerKit.swift */; };
+		588241A534C50B77F136A460 /* ServerErrorAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC8A77B2E3F848BBE355D52 /* ServerErrorAnalyzer.swift */; };
+		5CBA8A45D0093C62484EBAC0 /* PlayaServerKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D1EF4576F87E1F5817058087 /* PlayaServerKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5CF2CDC99AE3DCD21CBB2B3C /* SoftwareUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43C953E26374527414FD351 /* SoftwareUpdater.swift */; };
+		5E30B37F98F95919933CF85E /* ChatComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E01E17A9E2F8CD98AE0BC35 /* ChatComposer.swift */; };
+		68314F7A51E3C94DD7B4455A /* CLIProxyConfigurationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 008E236C1F2494C3EE91A2AA /* CLIProxyConfigurationSheet.swift */; };
+		6D80B37E1A26E4EDA54CD476 /* Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBDB5DAE8DD9C324777EC4B /* Formatting.swift */; };
+		75F8B734AD72AF1AC7CE4839 /* DeveloperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EFADEAEA0EC0C247CA0CB1 /* DeveloperView.swift */; };
+		79088962E4796977F173DC0B /* ControlPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF48538BAF221F0313C05202 /* ControlPanelView.swift */; };
+		7A2279F36C0C97C47F5DA48F /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 337C537BF50C30B4B1080EA2 /* WelcomeView.swift */; };
+		7B18EC40BB3F9A6F27C945D2 /* ModelHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4666A69DABC85688BB564899 /* ModelHistoryStore.swift */; };
+		7E026EB3BC080DFEBF4D4835 /* ChatSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9C6A8339EEF71EEC5B9A8B /* ChatSessionStore.swift */; };
+		8066A30BD9C29041DC2DAFD4 /* ModelSearchWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E985D77E91F0FDE236F43BD /* ModelSearchWebView.swift */; };
+		813854C923D7315BE255108D /* ImageGenerationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9190021845EED1B99734B5EC /* ImageGenerationViewModel.swift */; };
+		9F8D1AFA9FCBA0147473B660 /* PlayaAnalyticsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46576176DD18BA1068CD20F4 /* PlayaAnalyticsStore.swift */; };
+		A22522081F1660D87EC44745 /* ModelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5465B0F1ED479415E9EF3059 /* ModelsView.swift */; };
+		A46572AE8492F55F44F2D722 /* IntegrationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0F9AA73F9D3A7485BFAC39 /* IntegrationsView.swift */; };
+		ACF229B6BD0BEF1D6828DB63 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = F302CAF8DC90375EF68A4E44 /* Sparkle */; };
+		B14FC49A38A7DB73CBAB3C25 /* LICENSES.txt in Resources */ = {isa = PBXBuildFile; fileRef = A282C0B1CD8E6414B08FAEBB /* LICENSES.txt */; };
+		CEFE494E034EDD2C4284768D /* IntegrationServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600F4D8F241D666883C5DBBB /* IntegrationServices.swift */; };
+		CF7D90BE982808CD004ED534 /* PlayaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6DF4DDAF058866ED2CDDE61 /* PlayaModel.swift */; };
+		D4F1061B021ED2177F62D1E2 /* PlayaChatClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = DECB8E29287D26CD935DDAFE /* PlayaChatClient.swift */; };
+		DB1180213AC67C6DF29AC78C /* LocalModelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF874A293F91C8E14679FB20 /* LocalModelProvider.swift */; };
+		EC39CDC0C047FDC12F3EE01D /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5517ED16518947B95DD910C /* Main.swift */; };
+		EC624C50AED18C58BF93B175 /* FxAgentHarness.swift in Sources */ = {isa = PBXBuildFile; fileRef = A104290A132F99A2800DB379 /* FxAgentHarness.swift */; };
+		ECB3DCE4A2241B36F6EFC220 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B1831BE9E8ACA734FEC70B /* ChatView.swift */; };
+		EFCDBA57DFDA6ECE29792AB3 /* ImageGenerationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 394ABD272B380CE296658FBB /* ImageGenerationView.swift */; };
+		F5085DFF50DFCDF72B2B19A9 /* LocalModelDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0B3E9E3F4502756C431484 /* LocalModelDiscovery.swift */; };
+		F5260B29EA57A91DBD231785 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20EDBCCE2E5C5BF8B8D4C544 /* DashboardViewModel.swift */; };
+		FCFF3337899EB428A8129AD2 /* PlayaSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 593A3CBCB5977895C3CD5846 /* PlayaSettings.swift */; };
+		FEE4FB56F14E6B5E4BEF0531 /* HuggingFaceHub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A61EC2441BB9D24A75C0DA3 /* HuggingFaceHub.swift */; };
+		FEFE88B48FE3512DAB70B62A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D155489126C48836D24EB552 /* AppDelegate.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3FDDF6155DC1DD9558D85EB5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C6677931336BEA524482E3F1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2F702B9CCA050D861B7395D8;
+			remoteInfo = PlayaServerKit;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		110758CE868056B7C2B069BB /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5CBA8A45D0093C62484EBAC0 /* PlayaServerKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		008E236C1F2494C3EE91A2AA /* CLIProxyConfigurationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIProxyConfigurationSheet.swift; sourceTree = "<group>"; };
+		0A0B3E9E3F4502756C431484 /* LocalModelDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalModelDiscovery.swift; sourceTree = "<group>"; };
+		16B1831BE9E8ACA734FEC70B /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		1E01E17A9E2F8CD98AE0BC35 /* ChatComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatComposer.swift; sourceTree = "<group>"; };
+		1E0F9AA73F9D3A7485BFAC39 /* IntegrationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationsView.swift; sourceTree = "<group>"; };
+		20EDBCCE2E5C5BF8B8D4C544 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
+		224A92D73F8456D0B45ECF3D /* ModelDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDownloadManager.swift; sourceTree = "<group>"; };
+		2A4EAF4F2BC339FB01C73B13 /* MarkdownFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFormatting.swift; sourceTree = "<group>"; };
+		2BBDB5DAE8DD9C324777EC4B /* Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatting.swift; sourceTree = "<group>"; };
+		337C537BF50C30B4B1080EA2 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		394ABD272B380CE296658FBB /* ImageGenerationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageGenerationView.swift; sourceTree = "<group>"; };
+		46576176DD18BA1068CD20F4 /* PlayaAnalyticsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayaAnalyticsStore.swift; sourceTree = "<group>"; };
+		4666A69DABC85688BB564899 /* ModelHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelHistoryStore.swift; sourceTree = "<group>"; };
+		5465B0F1ED479415E9EF3059 /* ModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelsView.swift; sourceTree = "<group>"; };
+		593A3CBCB5977895C3CD5846 /* PlayaSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayaSettings.swift; sourceTree = "<group>"; };
+		5AC8A77B2E3F848BBE355D52 /* ServerErrorAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerErrorAnalyzer.swift; sourceTree = "<group>"; };
+		600F4D8F241D666883C5DBBB /* IntegrationServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationServices.swift; sourceTree = "<group>"; };
+		7BEA44F4CE2E8BA00C64D30A /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
+		7DE9605882AA9AA43BCDD584 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7E985D77E91F0FDE236F43BD /* ModelSearchWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSearchWebView.swift; sourceTree = "<group>"; };
+		82C1259CB40A759FF4BD8F66 /* Playa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Playa.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B776E45404D84AA91B03C0F /* PlayaImageClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayaImageClient.swift; sourceTree = "<group>"; };
+		8CC686B53E335E0053A7CC05 /* ChatConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatConfigurationView.swift; sourceTree = "<group>"; };
+		9190021845EED1B99734B5EC /* ImageGenerationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageGenerationViewModel.swift; sourceTree = "<group>"; };
+		9A61EC2441BB9D24A75C0DA3 /* HuggingFaceHub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceHub.swift; sourceTree = "<group>"; };
+		A104290A132F99A2800DB379 /* FxAgentHarness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FxAgentHarness.swift; sourceTree = "<group>"; };
+		A282C0B1CD8E6414B08FAEBB /* LICENSES.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSES.txt; sourceTree = "<group>"; };
+		A6DF4DDAF058866ED2CDDE61 /* PlayaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayaModel.swift; sourceTree = "<group>"; };
+		AF48538BAF221F0313C05202 /* ControlPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlPanelView.swift; sourceTree = "<group>"; };
+		C2F0CB726E5C9799AE519AFD /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
+		CB9C6A8339EEF71EEC5B9A8B /* ChatSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSessionStore.swift; sourceTree = "<group>"; };
+		D122651671CC762B287EBB77 /* PlayaServerKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayaServerKit.swift; sourceTree = "<group>"; };
+		D155489126C48836D24EB552 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D1EF4576F87E1F5817058087 /* PlayaServerKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PlayaServerKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D5517ED16518947B95DD910C /* Main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
+		D9CBC2FC7B2D716AD52BA39A /* ModelProviderIcons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ModelProviderIcons; path = Sources/Playa/ModelProviderIcons; sourceTree = SOURCE_ROOT; };
+		DECB8E29287D26CD935DDAFE /* PlayaChatClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayaChatClient.swift; sourceTree = "<group>"; };
+		DF874A293F91C8E14679FB20 /* LocalModelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalModelProvider.swift; sourceTree = "<group>"; };
+		E8EFADEAEA0EC0C247CA0CB1 /* DeveloperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperView.swift; sourceTree = "<group>"; };
+		F2C8DABB17ABE359F29972D0 /* GeminiOmniView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiOmniView.swift; sourceTree = "<group>"; };
+		F43C953E26374527414FD351 /* SoftwareUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoftwareUpdater.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FFF2165837A4E8F26CDB4C37 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2317BFEC1F303E8293EBF7B2 /* PlayaServerKit.framework in Frameworks */,
+				ACF229B6BD0BEF1D6828DB63 /* Sparkle in Frameworks */,
+				2B5A1986FB63358AFFE5816F /* Textual in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0B6A642107B4E24EF8AE252F /* Integrations */ = {
+			isa = PBXGroup;
+			children = (
+				008E236C1F2494C3EE91A2AA /* CLIProxyConfigurationSheet.swift */,
+				600F4D8F241D666883C5DBBB /* IntegrationServices.swift */,
+				1E0F9AA73F9D3A7485BFAC39 /* IntegrationsView.swift */,
+			);
+			path = Integrations;
+			sourceTree = "<group>";
+		};
+		10AAFE2D67EF3C8290AC9169 = {
+			isa = PBXGroup;
+			children = (
+				18C231ED06D76FE3A22F7E7C /* Configuration */,
+				E87DB213CA164DE3E790BACF /* Sources */,
+				C52DFF9BD110E6FB95C7650A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		18C231ED06D76FE3A22F7E7C /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				7BEA44F4CE2E8BA00C64D30A /* Signing.xcconfig */,
+			);
+			path = Configuration;
+			sourceTree = "<group>";
+		};
+		2D77CC5A0C2B6D5F5D133804 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				5AC8A77B2E3F848BBE355D52 /* ServerErrorAnalyzer.swift */,
+				8F77DB96811239188545E6FA /* Chat */,
+				AE9E3D1FCE2EDD9E574EBC01 /* Dashboard */,
+				89ED0F0D96886662B5D710F6 /* Developer */,
+				F95E01DD2FA210661BF54DC9 /* ImageGeneration */,
+				0B6A642107B4E24EF8AE252F /* Integrations */,
+				334CEA63609F99B9B40632E9 /* Models */,
+				FC29DB1ED705EC9927EFE6E4 /* VideoGeneration */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		31F0E150C22CFF4790E7F929 /* IntegrationLogos */ = {
+			isa = PBXGroup;
+			children = (
+				A282C0B1CD8E6414B08FAEBB /* LICENSES.txt */,
+			);
+			path = IntegrationLogos;
+			sourceTree = "<group>";
+		};
+		334CEA63609F99B9B40632E9 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				9A61EC2441BB9D24A75C0DA3 /* HuggingFaceHub.swift */,
+				0A0B3E9E3F4502756C431484 /* LocalModelDiscovery.swift */,
+				DF874A293F91C8E14679FB20 /* LocalModelProvider.swift */,
+				224A92D73F8456D0B45ECF3D /* ModelDownloadManager.swift */,
+				4666A69DABC85688BB564899 /* ModelHistoryStore.swift */,
+				7E985D77E91F0FDE236F43BD /* ModelSearchWebView.swift */,
+				5465B0F1ED479415E9EF3059 /* ModelsView.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		43A055BAD0503F54BE81F39C /* PlayaServerKit */ = {
+			isa = PBXGroup;
+			children = (
+				DECB8E29287D26CD935DDAFE /* PlayaChatClient.swift */,
+				8B776E45404D84AA91B03C0F /* PlayaImageClient.swift */,
+				D122651671CC762B287EBB77 /* PlayaServerKit.swift */,
+			);
+			path = PlayaServerKit;
+			sourceTree = "<group>";
+		};
+		89ED0F0D96886662B5D710F6 /* Developer */ = {
+			isa = PBXGroup;
+			children = (
+				E8EFADEAEA0EC0C247CA0CB1 /* DeveloperView.swift */,
+			);
+			path = Developer;
+			sourceTree = "<group>";
+		};
+		8F77DB96811239188545E6FA /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				1E01E17A9E2F8CD98AE0BC35 /* ChatComposer.swift */,
+				8CC686B53E335E0053A7CC05 /* ChatConfigurationView.swift */,
+				CB9C6A8339EEF71EEC5B9A8B /* ChatSessionStore.swift */,
+				16B1831BE9E8ACA734FEC70B /* ChatView.swift */,
+				A104290A132F99A2800DB379 /* FxAgentHarness.swift */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
+		AE9E3D1FCE2EDD9E574EBC01 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				20EDBCCE2E5C5BF8B8D4C544 /* DashboardViewModel.swift */,
+				46576176DD18BA1068CD20F4 /* PlayaAnalyticsStore.swift */,
+				C2F0CB726E5C9799AE519AFD /* StatsView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		BABA0A6AA988BAC42A9DDB11 /* Playa */ = {
+			isa = PBXGroup;
+			children = (
+				D155489126C48836D24EB552 /* AppDelegate.swift */,
+				7DE9605882AA9AA43BCDD584 /* Assets.xcassets */,
+				AF48538BAF221F0313C05202 /* ControlPanelView.swift */,
+				D5517ED16518947B95DD910C /* Main.swift */,
+				D9CBC2FC7B2D716AD52BA39A /* ModelProviderIcons */,
+				A6DF4DDAF058866ED2CDDE61 /* PlayaModel.swift */,
+				593A3CBCB5977895C3CD5846 /* PlayaSettings.swift */,
+				F43C953E26374527414FD351 /* SoftwareUpdater.swift */,
+				337C537BF50C30B4B1080EA2 /* WelcomeView.swift */,
+				2D77CC5A0C2B6D5F5D133804 /* Features */,
+				31F0E150C22CFF4790E7F929 /* IntegrationLogos */,
+				E581A32C189EED4A3F178C34 /* Utilities */,
+			);
+			path = Playa;
+			sourceTree = "<group>";
+		};
+		C52DFF9BD110E6FB95C7650A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				82C1259CB40A759FF4BD8F66 /* Playa.app */,
+				D1EF4576F87E1F5817058087 /* PlayaServerKit.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E581A32C189EED4A3F178C34 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				2BBDB5DAE8DD9C324777EC4B /* Formatting.swift */,
+				2A4EAF4F2BC339FB01C73B13 /* MarkdownFormatting.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		E87DB213CA164DE3E790BACF /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				BABA0A6AA988BAC42A9DDB11 /* Playa */,
+				43A055BAD0503F54BE81F39C /* PlayaServerKit */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		F95E01DD2FA210661BF54DC9 /* ImageGeneration */ = {
+			isa = PBXGroup;
+			children = (
+				394ABD272B380CE296658FBB /* ImageGenerationView.swift */,
+				9190021845EED1B99734B5EC /* ImageGenerationViewModel.swift */,
+			);
+			path = ImageGeneration;
+			sourceTree = "<group>";
+		};
+		FC29DB1ED705EC9927EFE6E4 /* VideoGeneration */ = {
+			isa = PBXGroup;
+			children = (
+				F2C8DABB17ABE359F29972D0 /* GeminiOmniView.swift */,
+			);
+			path = VideoGeneration;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2F702B9CCA050D861B7395D8 /* PlayaServerKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B164E4D5467F6FBE1F240E32 /* Build configuration list for PBXNativeTarget "PlayaServerKit" */;
+			buildPhases = (
+				FF4FBD2376C3A00914DB9B2A /* Sources */,
+				5F93EC8D353E8AF4CC73E1EA /* Build mlx-vlm-server resource */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PlayaServerKit;
+			packageProductDependencies = (
+			);
+			productName = PlayaServerKit;
+			productReference = D1EF4576F87E1F5817058087 /* PlayaServerKit.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		781331E7017DE5CD58E6AECB /* Playa */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DFA139FC93ADAF37D1E9F6B /* Build configuration list for PBXNativeTarget "Playa" */;
+			buildPhases = (
+				96A6ED84B47E1DC64682949D /* Sources */,
+				40F8F2E314AA5F1490C4D678 /* Resources */,
+				FFF2165837A4E8F26CDB4C37 /* Frameworks */,
+				110758CE868056B7C2B069BB /* Embed Frameworks */,
+				24A5844072DD06B401222B69 /* Embed fx agent harness */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8E2E767E555CBE77DD7DFA7A /* PBXTargetDependency */,
+			);
+			name = Playa;
+			packageProductDependencies = (
+				F302CAF8DC90375EF68A4E44 /* Sparkle */,
+				A687E0430048ACF12D420B13 /* Textual */,
+			);
+			productName = Playa;
+			productReference = 82C1259CB40A759FF4BD8F66 /* Playa.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C6677931336BEA524482E3F1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					2F702B9CCA050D861B7395D8 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					781331E7017DE5CD58E6AECB = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 72AE6E93AB6982C22D130DCF /* Build configuration list for PBXProject "Playa" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 10AAFE2D67EF3C8290AC9169;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C736A3B6D179D81C34F1372A /* XCRemoteSwiftPackageReference "Sparkle" */,
+				9BE3BA6045D07B2D8FDBA66E /* XCRemoteSwiftPackageReference "textual" */,
+			);
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				781331E7017DE5CD58E6AECB /* Playa */,
+				2F702B9CCA050D861B7395D8 /* PlayaServerKit */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		40F8F2E314AA5F1490C4D678 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10EAF010A6F7E4651496F399 /* Assets.xcassets in Resources */,
+				B14FC49A38A7DB73CBAB3C25 /* LICENSES.txt in Resources */,
+				27073D8F62EF9FFF5EF08095 /* ModelProviderIcons in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		24A5844072DD06B401222B69 /* Embed fx agent harness */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed fx agent harness";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\nFX_ROOT=\"${PLAYA_FX_SOURCE_ROOT:-$SRCROOT/../fx}\"\nFX_BINARY=\"$FX_ROOT/zig-out/bin/fx\"\n(cd \"$FX_ROOT\" && zig build -Doptimize=ReleaseSafe)\nDESTINATION=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/fx\"\nmkdir -p \"$(dirname \"$DESTINATION\")\"\ncp \"$FX_BINARY\" \"$DESTINATION\"\nchmod 755 \"$DESTINATION\"\n";
+		};
+		5F93EC8D353E8AF4CC73E1EA /* Build mlx-vlm-server resource */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build mlx-vlm-server resource";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\npython3 \"$SRCROOT/PythonDistribution/Scripts/build_xcode_framework_resource.py\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		96A6ED84B47E1DC64682949D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FEFE88B48FE3512DAB70B62A /* AppDelegate.swift in Sources */,
+				68314F7A51E3C94DD7B4455A /* CLIProxyConfigurationSheet.swift in Sources */,
+				5E30B37F98F95919933CF85E /* ChatComposer.swift in Sources */,
+				2F041183B24CCBE86ABCB4E9 /* ChatConfigurationView.swift in Sources */,
+				7E026EB3BC080DFEBF4D4835 /* ChatSessionStore.swift in Sources */,
+				ECB3DCE4A2241B36F6EFC220 /* ChatView.swift in Sources */,
+				79088962E4796977F173DC0B /* ControlPanelView.swift in Sources */,
+				F5260B29EA57A91DBD231785 /* DashboardViewModel.swift in Sources */,
+				75F8B734AD72AF1AC7CE4839 /* DeveloperView.swift in Sources */,
+				6D80B37E1A26E4EDA54CD476 /* Formatting.swift in Sources */,
+				EC624C50AED18C58BF93B175 /* FxAgentHarness.swift in Sources */,
+				52AF1E21034D02F2359AB521 /* GeminiOmniView.swift in Sources */,
+				FEE4FB56F14E6B5E4BEF0531 /* HuggingFaceHub.swift in Sources */,
+				EFCDBA57DFDA6ECE29792AB3 /* ImageGenerationView.swift in Sources */,
+				813854C923D7315BE255108D /* ImageGenerationViewModel.swift in Sources */,
+				CEFE494E034EDD2C4284768D /* IntegrationServices.swift in Sources */,
+				A46572AE8492F55F44F2D722 /* IntegrationsView.swift in Sources */,
+				F5085DFF50DFCDF72B2B19A9 /* LocalModelDiscovery.swift in Sources */,
+				DB1180213AC67C6DF29AC78C /* LocalModelProvider.swift in Sources */,
+				EC39CDC0C047FDC12F3EE01D /* Main.swift in Sources */,
+				008FB9DC05D768F90465C3CB /* MarkdownFormatting.swift in Sources */,
+				0C76CDA372F0023223AD0C0F /* ModelDownloadManager.swift in Sources */,
+				7B18EC40BB3F9A6F27C945D2 /* ModelHistoryStore.swift in Sources */,
+				8066A30BD9C29041DC2DAFD4 /* ModelSearchWebView.swift in Sources */,
+				A22522081F1660D87EC44745 /* ModelsView.swift in Sources */,
+				9F8D1AFA9FCBA0147473B660 /* PlayaAnalyticsStore.swift in Sources */,
+				CF7D90BE982808CD004ED534 /* PlayaModel.swift in Sources */,
+				FCFF3337899EB428A8129AD2 /* PlayaSettings.swift in Sources */,
+				588241A534C50B77F136A460 /* ServerErrorAnalyzer.swift in Sources */,
+				5CF2CDC99AE3DCD21CBB2B3C /* SoftwareUpdater.swift in Sources */,
+				41C835312DD1344671D62493 /* StatsView.swift in Sources */,
+				7A2279F36C0C97C47F5DA48F /* WelcomeView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FF4FBD2376C3A00914DB9B2A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4F1061B021ED2177F62D1E2 /* PlayaChatClient.swift in Sources */,
+				4776A6811D83F1375ACFF445 /* PlayaImageClient.swift in Sources */,
+				5395A8ABF53B53D3C7A039D7 /* PlayaServerKit.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8E2E767E555CBE77DD7DFA7A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2F702B9CCA050D861B7395D8 /* PlayaServerKit */;
+			targetProxy = 3FDDF6155DC1DD9558D85EB5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4096E8679217002A7DD935B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		4A073628FC5B09496A5957A5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BEA44F4CE2E8BA00C64D30A /* Signing.xcconfig */;
+			buildSettings = {
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Configuration/Playa-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Playa;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 0.3.3;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(PLAYA_BUNDLE_IDENTIFIER)";
+				PRODUCT_NAME = Playa;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		4F089364DC71E080A5C5321D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6B9ACE672E74A806F42E1062 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BEA44F4CE2E8BA00C64D30A /* Signing.xcconfig */;
+			buildSettings = {
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(PLAYA_SERVER_KIT_BUNDLE_IDENTIFIER)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		C0397AEE7420E0B6C9548F02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BEA44F4CE2E8BA00C64D30A /* Signing.xcconfig */;
+			buildSettings = {
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Configuration/Playa-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Playa;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 0.3.3;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(PLAYA_BUNDLE_IDENTIFIER)";
+				PRODUCT_NAME = Playa;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		CB163A695B47C6426431F731 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BEA44F4CE2E8BA00C64D30A /* Signing.xcconfig */;
+			buildSettings = {
+				ARCHS = arm64;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(PLAYA_SERVER_KIT_BUNDLE_IDENTIFIER)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DFA139FC93ADAF37D1E9F6B /* Build configuration list for PBXNativeTarget "Playa" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0397AEE7420E0B6C9548F02 /* Debug */,
+				4A073628FC5B09496A5957A5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		72AE6E93AB6982C22D130DCF /* Build configuration list for PBXProject "Playa" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4F089364DC71E080A5C5321D /* Debug */,
+				4096E8679217002A7DD935B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B164E4D5467F6FBE1F240E32 /* Build configuration list for PBXNativeTarget "PlayaServerKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6B9ACE672E74A806F42E1062 /* Debug */,
+				CB163A695B47C6426431F731 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9BE3BA6045D07B2D8FDBA66E /* XCRemoteSwiftPackageReference "textual" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/textual.git";
+			requirement = {
+				kind = exactVersion;
+				version = 0.5.0;
+			};
+		};
+		C736A3B6D179D81C34F1372A /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.9.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A687E0430048ACF12D420B13 /* Textual */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9BE3BA6045D07B2D8FDBA66E /* XCRemoteSwiftPackageReference "textual" */;
+			productName = Textual;
+		};
+		F302CAF8DC90375EF68A4E44 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C736A3B6D179D81C34F1372A /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = C6677931336BEA524482E3F1 /* Project object */;
+}

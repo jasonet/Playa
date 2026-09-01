@@ -1,0 +1,14 @@
+.cache/
+.venv/
+build/
+dist/
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.egg-info/
+__pycache__/
+.DS_Store
+AGENTS.md
+/Configuration/Signing.local.xcconfig
+
+.worktrees/

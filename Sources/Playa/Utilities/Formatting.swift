@@ -1,0 +1,456 @@
+import Foundation
+import PlayaServerKit
+
+struct FormattedCount {
+    let display: String
+    let tooltip: String
+}
+
+struct StatsEntry {
+    let label: String
+    let value: String
+    let tooltip: String?
+}
+
+enum PlayaFormatting {
+    private static let integerFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 0
+        return formatter
+    }()
+
+    private static let decimalFormatters: [Int: NumberFormatter] = {
+        Dictionary(uniqueKeysWithValues: (0...4).map { digits in
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.minimumFractionDigits = digits
+            formatter.maximumFractionDigits = digits
+            return (digits, formatter)
+        })
+    }()
+
+    static func compactCount(_ value: Int) -> FormattedCount {
+        let raw = integerFormatter.string(from: NSNumber(value: value)) ?? "\(value)"
+        let sign = value < 0 ? "-" : ""
+        let absoluteValue = Double(abs(value))
+        let units: [(suffix: String, factor: Double)] = [
+            ("T", 1_000_000_000_000),
+            ("B", 1_000_000_000),
+            ("M", 1_000_000),
+            ("K", 1_000),
+        ]
+
+        for unit in units where absoluteValue >= unit.factor {
+            let scaled = absoluteValue / unit.factor
+            let formatted = scaled >= 100
+                ? String(format: "%.0f%@", scaled, unit.suffix)
+                : String(format: "%.1f%@", scaled, unit.suffix)
+            return FormattedCount(
+                display: sign + formatted.replacingOccurrences(of: ".0", with: ""),
+                tooltip: raw
+            )
+        }
+
+        return FormattedCount(display: "\(value)", tooltip: raw)
+    }
+
+    static func rate(_ value: Double?) -> String {
+        guard let value, value > 0, value.isFinite else {
+            return "--"
+        }
+        return String(format: "%.1f tok/s", value)
+    }
+
+    static func decimal(_ value: Double?, fractionDigits: Int = 2) -> String {
+        guard let value, value.isFinite else {
+            return "--"
+        }
+
+        let digits = min(max(fractionDigits, 0), 4)
+        if let formatter = decimalFormatters[digits] {
+            return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+        }
+        return "\(value)"
+    }
+
+    static func integer(_ value: Int?) -> String {
+        guard let value else {
+            return "--"
+        }
+        return integerFormatter.string(from: NSNumber(value: value)) ?? "\(value)"
+    }
+
+    static func milliseconds(_ value: Double?, fractionDigits: Int = 0) -> String {
+        guard let value, value >= 0, value.isFinite else {
+            return "--"
+        }
+        return "\(decimal(value, fractionDigits: fractionDigits)) ms"
+    }
+
+    static func seconds(fromMilliseconds value: Int64?, fractionDigits: Int = 2) -> String {
+        guard let value, value >= 0 else {
+            return "--"
+        }
+        return decimal(Double(value) / 1_000, fractionDigits: fractionDigits)
+    }
+
+    static func gigabytes(fromBytes value: Int64?, fractionDigits: Int = 1) -> String {
+        guard let value, value >= 0 else {
+            return "--"
+        }
+        let gigabytes = Double(value) / Double(1024 * 1024 * 1024)
+        return "\(decimal(gigabytes, fractionDigits: fractionDigits)) GB"
+    }
+
+    static func duration(_ value: Double?) -> String {
+        guard let value, value >= 0, value.isFinite else {
+            return "--"
+        }
+
+        if value < 1 {
+            return String(format: "%.2fs", value)
+        }
+        if value < 60 {
+            return String(format: "%.1fs", value)
+        }
+
+        let totalSeconds = Int(value.rounded())
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+        if hours > 0 {
+            return "\(hours)h \(minutes)m"
+        }
+        return "\(minutes)m \(seconds)s"
+    }
+
+    static func elapsedDuration(_ value: TimeInterval) -> String {
+        guard value.isFinite else {
+            return "0s"
+        }
+
+        let totalSeconds = max(0, Int(value.rounded(.down)))
+        let hours = totalSeconds / 3_600
+        let minutes = (totalSeconds % 3_600) / 60
+        let seconds = totalSeconds % 60
+
+        if hours > 0 {
+            return minutes > 0 ? "\(hours)h \(minutes)m" : "\(hours)h"
+        }
+        if minutes > 0 {
+            return "\(minutes)m \(seconds)s"
+        }
+        return "\(seconds)s"
+    }
+
+    static func gigabytes(_ value: Double) -> String {
+        guard value.isFinite else {
+            return "--"
+        }
+        return String(format: "%.2f GB", value)
+    }
+
+    static func percent(_ value: Double) -> String {
+        guard value.isFinite else {
+            return "--"
+        }
+        let percent = value <= 1 ? value * 100 : value
+        return String(format: "%.1f%%", percent)
+    }
+
+    static func truncateModelName(_ value: String, maxLength: Int = 48) -> String {
+        guard value.count > maxLength else {
+            return value
+        }
+
+        let keep = max(8, (maxLength - 3) / 2)
+        let prefix = value.prefix(keep)
+        let suffix = value.suffix(keep)
+        return "\(prefix)...\(suffix)"
+    }
+
+    static func timestamp(_ value: Double?) -> String {
+        guard let value, value > 0 else {
+            return "--"
+        }
+        return Date(timeIntervalSince1970: value).formatted(
+            date: .abbreviated,
+            time: .shortened
+        )
+    }
+
+    static func titleizedIdentifier(_ value: String?) -> String {
+        guard let rawValue = value?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !rawValue.isEmpty
+        else {
+            return "--"
+        }
+
+        return rawValue
+            .replacingOccurrences(of: "_", with: " ")
+            .split(separator: " ")
+            .map { segment in
+                segment.prefix(1).uppercased() + segment.dropFirst().lowercased()
+            }
+            .joined(separator: " ")
+    }
+}
+
+enum PlayaStats {
+    static func sessionEntries(_ metrics: PlayaMetrics) -> [StatsEntry] {
+        [
+            statsEntry("Requests completed", metrics.summary.requestsCompleted),
+            statsEntry("Requests failed", metrics.summary.requestsFailed),
+            statsEntry("In flight", metrics.summary.inFlight),
+            statsEntry("Prompt tokens", metrics.summary.promptTokensTotal),
+            statsEntry("Generated tokens", metrics.summary.generatedTokensTotal),
+            statsEntry("Total processed tokens", metrics.summary.totalProcessedTokens),
+            StatsEntry(
+                label: "Avg decode speed",
+                value: PlayaFormatting.rate(metrics.summary.averageDecodeTokensPerSecond),
+                tooltip: nil
+            ),
+            StatsEntry(
+                label: "Avg request speed",
+                value: PlayaFormatting.rate(metrics.summary.averageRequestTokensPerSecond),
+                tooltip: nil
+            ),
+            StatsEntry(
+                label: "Uptime",
+                value: PlayaFormatting.duration(metrics.summary.uptimeSeconds),
+                tooltip: nil
+            ),
+        ]
+    }
+
+    static func allTimeEntries(_ allTimeStats: PlayaAllTimeStats) -> [StatsEntry] {
+        [
+            statsEntry("Requests completed", allTimeStats.requestsCompleted),
+            statsEntry("Requests failed", allTimeStats.requestsFailed),
+            statsEntry("Prompt tokens", allTimeStats.promptTokensTotal),
+            statsEntry("Generated tokens", allTimeStats.generatedTokensTotal),
+            statsEntry("Total processed tokens", allTimeStats.totalProcessedTokens),
+            StatsEntry(
+                label: "Avg decode speed",
+                value: PlayaFormatting.rate(allTimeStats.averageDecodeTokensPerSecond),
+                tooltip: nil
+            ),
+            StatsEntry(
+                label: "Avg request speed",
+                value: PlayaFormatting.rate(allTimeStats.averageRequestTokensPerSecond),
+                tooltip: nil
+            ),
+        ]
+    }
+
+    static func latestRequestEntries(_ latest: PlayaLatestRequest) -> [StatsEntry] {
+        let fullModel = latest.model ?? "None"
+        var entries: [StatsEntry] = [
+            StatsEntry(
+                label: "Model",
+                value: PlayaFormatting.truncateModelName(fullModel),
+                tooltip: fullModel
+            ),
+            StatsEntry(label: "Endpoint", value: latest.endpoint ?? "--", tooltip: nil),
+            statsEntry("Prompt tokens", latest.promptTokens),
+            statsEntry("Completion tokens", latest.completionTokens),
+            statsEntry("Generated tokens", latest.generatedTokens),
+            statsEntry("Total tokens", latest.promptTokens + latest.generatedTokens),
+            StatsEntry(
+                label: "Time to first token",
+                value: PlayaFormatting.duration(latest.timeToFirstTokenSeconds),
+                tooltip: nil
+            ),
+            StatsEntry(
+                label: "Prefill speed",
+                value: PlayaFormatting.rate(latest.prefillTokensPerSecond),
+                tooltip: nil
+            ),
+            StatsEntry(
+                label: "Decode speed",
+                value: PlayaFormatting.rate(latest.decodeTokensPerSecond),
+                tooltip: nil
+            ),
+            StatsEntry(
+                label: "Elapsed time",
+                value: PlayaFormatting.duration(latest.requestElapsedSeconds),
+                tooltip: nil
+            ),
+        ]
+
+        if let peakMemoryGB = latest.peakMemoryGB {
+            entries.append(StatsEntry(
+                label: "Peak memory",
+                value: PlayaFormatting.gigabytes(peakMemoryGB),
+                tooltip: nil
+            ))
+        }
+        if latest.imageCount > 0 || latest.audioCount > 0 {
+            entries.append(StatsEntry(
+                label: "Media",
+                value: "\(latest.imageCount) images, \(latest.audioCount) audio",
+                tooltip: nil
+            ))
+        }
+        if latest.thinkingEnabled || latest.toolCalls || latest.apcEnabled {
+            entries.append(StatsEntry(label: "Flags", value: latestFlags(latest), tooltip: nil))
+        }
+
+        return entries
+    }
+
+    static func runtimeEntries(_ runtime: PlayaRuntimeSnapshot) -> [StatsEntry] {
+        let loadedModel = runtime.displayLoadedModel
+        var entries: [StatsEntry] = [
+            StatsEntry(
+                label: "Loaded model",
+                value: PlayaFormatting.truncateModelName(loadedModel),
+                tooltip: loadedModel
+            ),
+            statsEntry("Queue depth", runtime.requestQueueDepth),
+            StatsEntry(label: "Batching", value: runtime.continuousBatchingEnabled ? "On" : "Off", tooltip: nil),
+            StatsEntry(label: "APC", value: runtime.apc.enabled ? "On" : "Off", tooltip: nil),
+        ]
+
+        if let contextLimit = runtime.effectiveContextLimit ?? runtime.configuredContextLimit ?? runtime.loadedContextSize {
+            entries.append(statsEntry("Context limit", contextLimit))
+        }
+        if let loadedAdapter = runtime.loadedAdapter {
+            entries.append(StatsEntry(
+                label: "Adapter",
+                value: PlayaFormatting.truncateModelName(loadedAdapter),
+                tooltip: loadedAdapter
+            ))
+        }
+        if let toolParser = runtime.loadedToolParser {
+            entries.append(StatsEntry(label: "Tool parser", value: toolParser, tooltip: nil))
+        }
+        if runtime.apc.enabled {
+            if let tokenHitRate = runtime.apc.tokenHitRate {
+                entries.append(StatsEntry(
+                    label: "APC token hit rate",
+                    value: PlayaFormatting.percent(tokenHitRate),
+                    tooltip: nil
+                ))
+            }
+            if let matchedTokens = runtime.apc.matchedTokens {
+                entries.append(statsEntry("APC matched tokens", matchedTokens))
+            }
+            if let diskHits = runtime.apc.diskHits {
+                entries.append(statsEntry("APC disk hits", diskHits))
+            }
+        }
+
+        return entries
+    }
+
+    static func modelEntries(_ model: PlayaModelMetrics) -> [StatsEntry] {
+        [
+            statsEntry("Requests completed", model.requestsCompleted),
+            statsEntry("Requests failed", model.requestsFailed),
+            statsEntry("Streamed requests", model.streamingRequests),
+            statsEntry("Prompt tokens", model.promptTokensTotal),
+            statsEntry("Generated tokens", model.generatedTokensTotal),
+            statsEntry("Total processed tokens", model.totalProcessedTokens),
+            StatsEntry(
+                label: "Avg request speed",
+                value: PlayaFormatting.rate(model.averageRequestTokensPerSecond),
+                tooltip: nil
+            ),
+            StatsEntry(
+                label: "Avg decode speed",
+                value: PlayaFormatting.rate(model.averageDecodeTokensPerSecond),
+                tooltip: nil
+            ),
+            StatsEntry(
+                label: "Last request",
+                value: PlayaFormatting.timestamp(model.lastRequestAt),
+                tooltip: nil
+            ),
+        ]
+    }
+
+    static func statsEntry(_ label: String, _ value: Int) -> StatsEntry {
+        let formatted = PlayaFormatting.compactCount(value)
+        return StatsEntry(label: label, value: formatted.display, tooltip: formatted.tooltip)
+    }
+
+    private static func latestFlags(_ latest: PlayaLatestRequest) -> String {
+        var flags: [String] = []
+        if latest.thinkingEnabled {
+            flags.append("thinking")
+        }
+        if latest.toolCalls {
+            flags.append("tools")
+        }
+        if latest.apcEnabled {
+            flags.append("APC")
+        }
+        return flags.isEmpty ? "--" : flags.joined(separator: ", ")
+    }
+}
+
+struct PlayaAllTimeStats: Codable {
+    var requestsCompleted: Int = 0
+    var requestsFailed: Int = 0
+    var promptTokensTotal: Int = 0
+    var completionTokensTotal: Int = 0
+    var generatedTokensTotal: Int = 0
+    var decodeTokensTotal: Int?
+    var requestTimeTotalSeconds: Double = 0
+    var decodeTimeTotalSeconds: Double = 0
+    var lastUpdated: Date?
+
+    var totalProcessedTokens: Int {
+        promptTokensTotal + generatedTokensTotal
+    }
+
+    var hasValues: Bool {
+        requestsCompleted > 0 ||
+            requestsFailed > 0 ||
+            promptTokensTotal > 0 ||
+            completionTokensTotal > 0 ||
+            generatedTokensTotal > 0 ||
+            requestTimeTotalSeconds > 0 ||
+            decodeTimeTotalSeconds > 0
+    }
+
+    var averageDecodeTokensPerSecond: Double? {
+        let measuredTokens = decodeTokensTotal ?? generatedTokensTotal
+        guard measuredTokens > 0, decodeTimeTotalSeconds > 0 else {
+            return nil
+        }
+        return Double(measuredTokens) / decodeTimeTotalSeconds
+    }
+
+    var averageRequestTokensPerSecond: Double? {
+        guard completionTokensTotal > 0, requestTimeTotalSeconds > 0 else {
+            return nil
+        }
+        return Double(completionTokensTotal) / requestTimeTotalSeconds
+    }
+
+    static func load(from databaseURL: URL = PlayaAnalyticsStore.defaultDatabaseURL()) -> PlayaAllTimeStats {
+        PlayaAnalyticsStore(databaseURL: databaseURL)
+            .fetchSummary(range: .allTime)
+            .asAllTimeStats
+    }
+
+    static func removeLegacyStorage() {
+        let url = legacyStorageURL()
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            return
+        }
+        try? FileManager.default.removeItem(at: url)
+    }
+
+    private static func legacyStorageURL() -> URL {
+        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first
+            ?? FileManager.default.temporaryDirectory
+        let bundleID = Bundle.main.bundleIdentifier ?? "dev.local.Playa"
+        return caches
+            .appendingPathComponent(bundleID, isDirectory: true)
+            .appendingPathComponent("PlayaStats.plist")
+    }
+}

@@ -1,0 +1,97 @@
+name: Playa
+options:
+  bundleIdPrefix: dev.local
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    ARCHS: arm64
+    ENABLE_HARDENED_RUNTIME: YES
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    exactVersion: 2.9.4
+  textual:
+    url: https://github.com/gonzalezreal/textual.git
+    exactVersion: 0.5.0
+schemes:
+  Playa:
+    build:
+      targets:
+        Playa: all
+    run:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+targets:
+  PlayaServerKit:
+    type: framework
+    platform: macOS
+    configFiles:
+      Debug: Configuration/Signing.xcconfig
+      Release: Configuration/Signing.xcconfig
+    sources:
+      - path: Sources/PlayaServerKit
+    postBuildScripts:
+      - name: Build mlx-vlm-server resource
+        basedOnDependencyAnalysis: false
+        script: |
+          set -euo pipefail
+          python3 "$SRCROOT/PythonDistribution/Scripts/build_xcode_framework_resource.py"
+    settings:
+      base:
+        ARCHS: arm64
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+        PRODUCT_BUNDLE_IDENTIFIER: $(PLAYA_SERVER_KIT_BUNDLE_IDENTIFIER)
+        GENERATE_INFOPLIST_FILE: YES
+        SKIP_INSTALL: YES
+  Playa:
+    type: application
+    platform: macOS
+    configFiles:
+      Debug: Configuration/Signing.xcconfig
+      Release: Configuration/Signing.xcconfig
+    sources:
+      - path: Sources/Playa
+        excludes:
+          - ModelProviderIcons
+      - path: Sources/Playa/ModelProviderIcons
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - target: PlayaServerKit
+      - package: Sparkle
+        product: Sparkle
+      - package: textual
+        product: Textual
+    postBuildScripts:
+      - name: Embed fx agent harness
+        basedOnDependencyAnalysis: false
+        script: |
+          set -euo pipefail
+          FX_ROOT="${PLAYA_FX_SOURCE_ROOT:-$SRCROOT/../fx}"
+          FX_BINARY="$FX_ROOT/zig-out/bin/fx"
+          (cd "$FX_ROOT" && zig build -Doptimize=ReleaseSafe)
+          DESTINATION="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/fx"
+          mkdir -p "$(dirname "$DESTINATION")"
+          cp "$FX_BINARY" "$DESTINATION"
+          chmod 755 "$DESTINATION"
+    settings:
+      base:
+        ARCHS: arm64
+        MACOSX_DEPLOYMENT_TARGET: "26.0"
+        PRODUCT_BUNDLE_IDENTIFIER: $(PLAYA_BUNDLE_IDENTIFIER)
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Configuration/Playa-Info.plist
+        INFOPLIST_KEY_CFBundleDisplayName: Playa
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+        PRODUCT_NAME: Playa
+        MARKETING_VERSION: 0.3.3
+        CURRENT_PROJECT_VERSION: 1

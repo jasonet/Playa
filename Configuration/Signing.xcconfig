@@ -1,0 +1,12 @@
+// Shared development signing defaults. Add machine-specific overrides to
+// Signing.local.xcconfig; that file is optional and ignored by Git.
+
+PLAYA_BUNDLE_IDENTIFIER = dev.local.Playa
+PLAYA_SERVER_KIT_BUNDLE_IDENTIFIER = dev.local.PlayaServerKit
+PLAYA_SPARKLE_PUBLIC_KEY =
+
+DEVELOPMENT_TEAM =
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY = Apple Development
+
+#include? "Signing.local.xcconfig"
