@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Design/PlayaBanner.png" alt="Playa banner" width="100%">
+  <img src="website/assets/screenshots/playa-chat-agent.png" alt="Playa running a multimodal Fx Agent conversation on macOS" width="100%">
 </p>
 
 <h1 align="center">Playa</h1>
@@ -16,6 +16,19 @@
 </p>
 
 Playa turns an Apple Silicon Mac into a private AI model studio and agent workspace. It combines one-click MLX inference, a local model catalog designed for hundreds of models and terabytes of storage, OpenAI-compatible third-party providers, Fx Agent multimodal sessions, and image generation or editing through supported Codex and Gemini models.
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="website/assets/screenshots/playa-model-library.png" alt="Playa model library with automatic tags, filters, sizes, and local MLX models" width="100%">
+      <p><strong>Manage model libraries at scale.</strong> Discover local MLX and GGUF models, filter them with automatic tags, compare disk usage, and launch compatible models from one native workspace.</p>
+    </td>
+    <td width="50%" valign="top">
+      <img src="website/assets/screenshots/playa-integrations-latest.png" alt="Playa integrations for OpenComputer, CLIProxyAPI, Claude Code, Codex, Hermes, Pi, and OpenCode" width="100%">
+      <p><strong>Connect models to the tools you already use.</strong> Configure provider-backed chat, coding agents, OpenComputer environments, and OpenAI-compatible integrations without leaving Playa.</p>
+    </td>
+  </tr>
+</table>
 
 ## Highlights
 

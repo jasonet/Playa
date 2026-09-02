@@ -8,6 +8,7 @@ DerivedData/
 *.egg-info/
 __pycache__/
 .DS_Store
+/WeCom截圖_*.png
 AGENTS.md
 /Configuration/Signing.local.xcconfig
 
