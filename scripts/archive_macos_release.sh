@@ -24,6 +24,7 @@ Options:
   --team-id ID          Sign using a certificate resolved from this Team ID.
   --no-timestamp        Pass --no-timestamp to the signing script. Intended
                         only for local Apple Development signing.
+  --adhoc               Ad-hoc sign an unnotarized community archive.
   -h, --help            Show this help.
 EOF
 }
@@ -42,6 +43,7 @@ sign_archive=false
 identity=""
 team_id=""
 no_timestamp=false
+adhoc=false
 marketing_version=""
 build_number=""
 
@@ -91,6 +93,11 @@ while (($# > 0)); do
             no_timestamp=true
             shift
             ;;
+        --adhoc)
+            sign_archive=true
+            adhoc=true
+            shift
+            ;;
         -h|--help)
             usage
             exit 0
@@ -103,6 +110,9 @@ done
 
 if [[ -n "$identity" && -n "$team_id" ]]; then
     fail "use either --identity or --team-id, not both"
+fi
+if [[ "$adhoc" == true && ( -n "$identity" || -n "$team_id" ) ]]; then
+    fail "--adhoc cannot be combined with --identity or --team-id"
 fi
 if [[ "$no_timestamp" == true && "$sign_archive" == false ]]; then
     fail "--no-timestamp requires --sign, --team-id, or --identity"
@@ -183,7 +193,9 @@ fi
 
 if [[ "$sign_archive" == true ]]; then
     signing_arguments=()
-    if [[ -n "$identity" ]]; then
+    if [[ "$adhoc" == true ]]; then
+        signing_arguments+=(--adhoc)
+    elif [[ -n "$identity" ]]; then
         signing_arguments+=(--identity "$identity")
     elif [[ -n "$team_id" ]]; then
         signing_arguments+=(--team-id "$team_id")

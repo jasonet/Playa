@@ -53,6 +53,13 @@ class Asset:
     url: str
 
 
+@dataclass(frozen=True)
+class PruneSummary:
+    removed_directories: int
+    removed_bytecode_files: int
+    removed_bytes: int
+
+
 def log(message: str) -> None:
     print(f"==> {message}", flush=True)
 
@@ -247,9 +254,10 @@ def build_signature(
     requirements: Path | None,
     mlx_vlm_source: Path | None,
     skip_install: bool,
+    prune_release: bool,
 ) -> dict[str, object]:
     return {
-        "version": 3,
+        "version": 4,
         "asset": asset.name,
         "python_version": python_version,
         "pbs_release": pbs_release,
@@ -276,6 +284,7 @@ def build_signature(
         "overlay_server_sha256": file_sha256(OVERLAY_SERVER),
         "builder_sha256": file_sha256(Path(__file__)),
         "skip_install": skip_install,
+        "prune_release": prune_release,
     }
 
 
@@ -340,6 +349,7 @@ ROOT_DIR="$(cd "$BIN_DIR/.." >/dev/null 2>&1 && pwd)"
 
 export PYTHONHOME="$ROOT_DIR/python"
 export PYTHONNOUSERSITE=1
+export PYTHONDONTWRITEBYTECODE=1
 
 PARENT_PID="$PPID"
 LAUNCHER_PID="$$"
@@ -540,11 +550,88 @@ def install_overlay(output: Path) -> None:
     shutil.copy2(OVERLAY_SERVER, destination)
 
 
+def path_size(path: Path) -> int:
+    if path.is_symlink():
+        return 0
+    if path.is_file():
+        return path.stat().st_size
+    return sum(
+        candidate.stat().st_size
+        for candidate in path.rglob("*")
+        if candidate.is_file() and not candidate.is_symlink()
+    )
+
+
+def prune_distribution(output: Path) -> PruneSummary:
+    python = output / "python"
+    library_roots = sorted((python / "lib").glob("python*"))
+    site_packages = site_packages_dir(output)
+
+    candidates = [python / "include"]
+    for library_root in library_roots:
+        candidates.extend(
+            library_root / name
+            for name in ("ensurepip", "idlelib", "tkinter", "turtledemo")
+        )
+    candidates.append(site_packages / "pip")
+    candidates.extend(site_packages.glob("pip-*.dist-info"))
+    candidates.extend(
+        path
+        for path in site_packages.rglob("*")
+        if path.is_dir() and path.name in {"test", "tests"}
+    )
+    candidates.extend(path for path in python.rglob("__pycache__") if path.is_dir())
+
+    # Remove deepest paths first and de-duplicate nested candidates. A package's
+    # runtime modules (including names such as testing.py) are intentionally kept.
+    unique_candidates = sorted(
+        {path for path in candidates if path.exists() or path.is_symlink()},
+        key=lambda path: len(path.parts),
+        reverse=True,
+    )
+    removed_directories = 0
+    removed_bytes = 0
+    for path in unique_candidates:
+        if not path.exists() and not path.is_symlink():
+            continue
+        removed_bytes += path_size(path)
+        if path.is_symlink() or path.is_file():
+            path.unlink()
+        else:
+            shutil.rmtree(path)
+            removed_directories += 1
+
+    removed_bytecode_files = 0
+    for pattern in ("*.pyc", "*.pyo"):
+        for path in python.rglob(pattern):
+            if not path.is_file():
+                continue
+            removed_bytes += path.stat().st_size
+            path.unlink()
+            removed_bytecode_files += 1
+
+    summary = PruneSummary(
+        removed_directories=removed_directories,
+        removed_bytecode_files=removed_bytecode_files,
+        removed_bytes=removed_bytes,
+    )
+    log(
+        "Pruned release distribution: "
+        f"{summary.removed_directories} directories, "
+        f"{summary.removed_bytecode_files} bytecode files, "
+        f"{summary.removed_bytes / (1024 * 1024):.1f} MiB"
+    )
+    return summary
+
+
 def verify_distribution(output: Path, *, expect_mlx_vlm: bool) -> None:
     python = python_executable(output / "python")
     launcher = output / "bin" / "mlx-vlm-server"
+    env = os.environ.copy()
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    env["PYTHONNOUSERSITE"] = "1"
 
-    run([str(python), "-c", "import sys; print(sys.version)"])
+    run([str(python), "-c", "import sys; print(sys.version)"], env=env)
     if expect_mlx_vlm:
         run(
             [
@@ -552,7 +639,8 @@ def verify_distribution(output: Path, *, expect_mlx_vlm: bool) -> None:
                 "-c",
                 "import importlib.util; "
                 "raise SystemExit(0 if importlib.util.find_spec('mlx_vlm.server') else 1)",
-            ]
+            ],
+            env=env,
         )
         run(
             [
@@ -560,7 +648,8 @@ def verify_distribution(output: Path, *, expect_mlx_vlm: bool) -> None:
                 "-c",
                 "import importlib.util; "
                 "raise SystemExit(0 if importlib.util.find_spec('playa_server') else 1)",
-            ]
+            ],
+            env=env,
         )
     if not launcher.exists():
         raise SystemExit(f"Missing launcher: {launcher}")
@@ -641,6 +730,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Only verify an existing output tree",
     )
+    parser.add_argument(
+        "--prune-release",
+        action="store_true",
+        help="Remove bytecode caches, tests, pip, Tk/IDLE, and development headers",
+    )
     parser.add_argument("--force", action="store_true", help="Rebuild even if output exists")
     return parser.parse_args()
 
@@ -685,6 +779,7 @@ def main() -> None:
         requirements=requirements,
         mlx_vlm_source=mlx_vlm_source,
         skip_install=args.skip_install,
+        prune_release=args.prune_release,
     )
 
     if output.exists() and not args.force and has_valid_stamp(output, signature):
@@ -718,6 +813,8 @@ def main() -> None:
         install_overlay(output)
 
     launcher = write_or_build_launcher(output)
+    if args.prune_release:
+        prune_distribution(output)
     verify_distribution(output, expect_mlx_vlm=not args.skip_install)
     write_stamp(output, signature)
 

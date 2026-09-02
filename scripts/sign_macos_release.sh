@@ -18,6 +18,8 @@ Options:
   --no-timestamp   Disable the secure timestamp for local development testing.
                    This selects Apple Development for Team ID resolution and is
                    rejected for Developer ID Application identities.
+  --adhoc          Ad-hoc sign an unnotarized community build. This provides
+                   code integrity but does not establish a trusted developer.
   -h, --help       Show this help.
 EOF
 }
@@ -32,6 +34,7 @@ repository_root="$(cd "$script_directory/.." && pwd -P)"
 identity="${CODE_SIGN_IDENTITY:-}"
 team_id="${PLAYA_TEAM_ID:-}"
 use_timestamp=true
+adhoc=false
 
 while (($# > 0)); do
     case "$1" in
@@ -46,6 +49,12 @@ while (($# > 0)); do
             shift 2
             ;;
         --no-timestamp)
+            use_timestamp=false
+            shift
+            ;;
+        --adhoc)
+            adhoc=true
+            identity="-"
             use_timestamp=false
             shift
             ;;
@@ -80,6 +89,9 @@ target_path="$target_directory/$(basename "$target_path")"
 app_path="$target_path"
 
 [[ -z "$identity" || -z "$team_id" ]] || fail "use either --identity or --team-id, not both"
+if [[ "$adhoc" == true && -n "$team_id" ]]; then
+    fail "--adhoc cannot be combined with --team-id"
+fi
 
 if [[ -z "$identity" && -z "$team_id" ]]; then
     team_id="$(
@@ -137,8 +149,11 @@ if [[ -n "$team_id" ]]; then
     echo "Resolved signing identity: $identity_display_name"
 fi
 
-identity_line="$(security find-identity -v -p codesigning 2>/dev/null | grep -F "$identity" | head -n 1 || true)"
-[[ -n "$identity_line" ]] || fail "codesigning identity not found: $identity"
+identity_line=""
+if [[ "$adhoc" == false ]]; then
+    identity_line="$(security find-identity -v -p codesigning 2>/dev/null | grep -F "$identity" | head -n 1 || true)"
+    [[ -n "$identity_line" ]] || fail "codesigning identity not found: $identity"
+fi
 
 if [[ "$use_timestamp" == false && "$identity_line" == *"Developer ID Application"* ]]; then
     fail "Developer ID Application signatures require a secure timestamp"
@@ -149,17 +164,43 @@ if [[ "$use_timestamp" == false ]]; then
     timestamp_arguments=(--timestamp=none)
 fi
 
+adhoc_python_entitlements=""
+cleanup() {
+    [[ -z "$adhoc_python_entitlements" ]] || rm -f "$adhoc_python_entitlements"
+}
+trap cleanup EXIT
+
+if [[ "$adhoc" == true ]]; then
+    adhoc_python_entitlements="$(mktemp "${TMPDIR:-/tmp}/playa-python-entitlements.XXXXXX")"
+    cat > "$adhoc_python_entitlements" <<'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+</dict>
+</plist>
+PLIST
+fi
+
 sign_target() {
     local target="$1"
+    local entitlement_arguments=()
+    if [[ "$adhoc" == true && "$target" == */python/bin/python3.* ]]; then
+        entitlement_arguments=(--entitlements "$adhoc_python_entitlements")
+    fi
     codesign \
         --force \
         --sign "$identity" \
         --options runtime \
         "${timestamp_arguments[@]}" \
+        "${entitlement_arguments[@]}" \
         "$target"
 }
 
 if [[ "$is_disk_image" == true ]]; then
+    [[ "$adhoc" == false ]] || fail "ad-hoc signing a DMG container is not supported; sign the app before packaging"
     echo "Signing disk image with: $identity"
     codesign \
         --force \

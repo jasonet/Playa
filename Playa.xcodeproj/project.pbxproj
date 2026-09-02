@@ -578,7 +578,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.3.3;
+				MARKETING_VERSION = 0.3.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(PLAYA_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = Playa;
 				SDKROOT = macosx;
@@ -692,7 +692,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.3.3;
+				MARKETING_VERSION = 0.3.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(PLAYA_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = Playa;
 				SDKROOT = macosx;
