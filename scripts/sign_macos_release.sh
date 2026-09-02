@@ -165,13 +165,16 @@ if [[ "$use_timestamp" == false ]]; then
 fi
 
 adhoc_python_entitlements=""
+adhoc_app_entitlements=""
 cleanup() {
     [[ -z "$adhoc_python_entitlements" ]] || rm -f "$adhoc_python_entitlements"
+    [[ -z "$adhoc_app_entitlements" ]] || rm -f "$adhoc_app_entitlements"
 }
 trap cleanup EXIT
 
 if [[ "$adhoc" == true ]]; then
     adhoc_python_entitlements="$(mktemp "${TMPDIR:-/tmp}/playa-python-entitlements.XXXXXX")"
+    adhoc_app_entitlements="$(mktemp "${TMPDIR:-/tmp}/playa-app-entitlements.XXXXXX")"
     cat > "$adhoc_python_entitlements" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -182,21 +185,34 @@ if [[ "$adhoc" == true ]]; then
 </dict>
 </plist>
 PLIST
+    cp "$adhoc_python_entitlements" "$adhoc_app_entitlements"
 fi
 
 sign_target() {
     local target="$1"
-    local entitlement_arguments=()
+    local entitlements=""
     if [[ "$adhoc" == true && "$target" == */python/bin/python3.* ]]; then
-        entitlement_arguments=(--entitlements "$adhoc_python_entitlements")
+        entitlements="$adhoc_python_entitlements"
     fi
-    codesign \
-        --force \
-        --sign "$identity" \
-        --options runtime \
-        "${timestamp_arguments[@]}" \
-        "${entitlement_arguments[@]}" \
-        "$target"
+    if [[ "$adhoc" == true && "$target" == "$app_path" ]]; then
+        entitlements="$adhoc_app_entitlements"
+    fi
+    if [[ -n "$entitlements" ]]; then
+        codesign \
+            --force \
+            --sign "$identity" \
+            --options runtime \
+            "${timestamp_arguments[@]}" \
+            --entitlements "$entitlements" \
+            "$target"
+    else
+        codesign \
+            --force \
+            --sign "$identity" \
+            --options runtime \
+            "${timestamp_arguments[@]}" \
+            "$target"
+    fi
 }
 
 if [[ "$is_disk_image" == true ]]; then

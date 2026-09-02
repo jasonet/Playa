@@ -24,6 +24,18 @@ class CommunityReleaseToolingTests(unittest.TestCase):
         self.assertIn("com.apple.security.cs.disable-library-validation", script)
         self.assertIn("*/python/bin/python3.*", script)
 
+    def test_adhoc_signer_allows_app_to_load_adhoc_frameworks(self) -> None:
+        script = SIGN_SCRIPT.read_text()
+        self.assertIn('if [[ "$adhoc" == true && "$target" == "$app_path" ]]', script)
+        self.assertIn('entitlements="$adhoc_app_entitlements"', script)
+        self.assertIn('--entitlements "$entitlements"', script)
+
+    def test_signer_is_compatible_with_macos_bash_empty_entitlement_arguments(self) -> None:
+        script = SIGN_SCRIPT.read_text()
+        self.assertNotIn('"${entitlement_arguments[@]}"', script)
+        self.assertIn('local entitlements=""', script)
+        self.assertIn('if [[ -n "$entitlements" ]]; then', script)
+
     def test_packager_exposes_fixed_034_artifact_name_and_size_limit(self) -> None:
         result = subprocess.run(
             [str(PACKAGE_SCRIPT), "--help"], check=True, capture_output=True, text=True
