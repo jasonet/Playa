@@ -93,6 +93,10 @@ flowchart LR
 - [Zig](https://ziglang.org/) and a local checkout of [vercel-labs/fx](https://github.com/vercel-labs/fx) at `../fx`, or `PLAYA_FX_SOURCE_ROOT` pointing to it
 - Network access during the first embedded-runtime build
 
+## Community download
+
+The `v0.3.4` release includes `Playa-0.3.4-macos-arm64-unnotarized.dmg`, an ad-hoc-signed Apple Silicon community build containing the complete offline MLX and MLX-VLM Python runtime. It is **not notarized by Apple**, so macOS Gatekeeper may block the first launch. Verify the published SHA-256 checksum, copy Playa to `/Applications`, then Control-click the app and choose **Open**. See the release notes for the full security notice.
+
 ## Build from source
 
 ```sh

@@ -102,16 +102,23 @@ def sign_embedded_code(output: Path) -> None:
         )
 
 
-def main() -> None:
-    output = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else default_output()
-    output.parent.mkdir(parents=True, exist_ok=True)
-
+def distribution_build_command(output: Path) -> list[str]:
     command = [
         sys.executable,
         str(PYTHON_DISTRIBUTION_ROOT / "Scripts" / "build_mlx_vlm_server.py"),
         "--output",
         str(output),
     ]
+    if os.environ.get("CONFIGURATION") == "Release":
+        command.append("--prune-release")
+    return command
+
+
+def main() -> None:
+    output = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else default_output()
+    output.parent.mkdir(parents=True, exist_ok=True)
+
+    command = distribution_build_command(output)
     mlx_vlm_source = default_mlx_vlm_source()
     if mlx_vlm_source is not None:
         print(f"Using local mlx-vlm source {mlx_vlm_source}")
