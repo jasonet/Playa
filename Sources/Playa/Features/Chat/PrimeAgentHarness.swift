@@ -56,7 +56,7 @@ struct PrimeAgentHarness: Sendable {
                             onEvent: { event in
                                 if case .status(let status) = event { await collector.set(status) }
                             },
-                            maxSteps: task.readOnly ? 10 : 16
+                            maxSteps: task.readOnly ? 12 : 20
                         )
                         let report = try await runtime.run(
                             goal: "Overall goal: \(prompt)\nYour assignment: \(task.task)\nDependency reports:\n\(dependencyContext)",
@@ -95,10 +95,24 @@ struct PrimeAgentHarness: Sendable {
     }
 
     static func decodePlan(_ text: String, fallbackGoal: String) -> [PrimeAgentPlan.Task] {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleaned = NativeAgentRuntime.cleanModelOutput(text)
+        let candidate: String
+        if let blockRange = cleaned.range(of: "```json") ?? cleaned.range(of: "```") {
+            let afterFence = cleaned[blockRange.upperBound...]
+            if let closingFence = afterFence.range(of: "```") {
+                candidate = String(afterFence[..<closingFence.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+            } else {
+                candidate = cleaned
+            }
+        } else if let first = cleaned.firstIndex(of: "{"), let last = cleaned.lastIndex(of: "}"), first < last {
+            candidate = String(cleaned[first...last])
+        } else {
+            candidate = cleaned
+        }
+
         let decoded: PrimeAgentPlan? = {
-            guard let first = trimmed.firstIndex(of: "{"), let last = trimmed.lastIndex(of: "}") else { return nil }
-            return try? JSONDecoder().decode(PrimeAgentPlan.self, from: Data(trimmed[first...last].utf8))
+            guard let first = candidate.firstIndex(of: "{"), let last = candidate.lastIndex(of: "}") else { return nil }
+            return try? JSONDecoder().decode(PrimeAgentPlan.self, from: Data(candidate[first...last].utf8))
         }()
         var seen = Set<String>()
         let normalized = (decoded?.tasks ?? []).prefix(4).compactMap { task -> PrimeAgentPlan.Task? in
