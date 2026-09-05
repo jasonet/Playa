@@ -93,5 +93,5 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: Playa
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
         PRODUCT_NAME: Playa
-        MARKETING_VERSION: 0.3.4
+        MARKETING_VERSION: 0.3.5
         CURRENT_PROJECT_VERSION: 1

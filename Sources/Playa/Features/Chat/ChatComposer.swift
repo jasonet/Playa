@@ -266,7 +266,7 @@ struct ChatComposer: View {
     private var agentPickers: some View {
         HStack(spacing: 4) {
             Menu {
-                ForEach(FxAgentProvider.allCases) { provider in
+                ForEach(viewModel.availableAgentProviders) { provider in
                     Button {
                         viewModel.selectAgentProvider(provider)
                     } label: {
@@ -286,8 +286,8 @@ struct ChatComposer: View {
             }
             .menuStyle(.borderlessButton)
             .fixedSize()
-            .disabled(viewModel.hasPendingRequests)
-            .help("Select fx model channel")
+            .disabled(agentPickerIsDisabled)
+            .help("Select Agent model channel")
 
             Menu {
                 if viewModel.currentAgentProvider == .gateway {
@@ -295,7 +295,7 @@ struct ChatComposer: View {
                         Section("Currently running") {
                             ForEach(gatewayRunningModelIDs, id: \.self) { modelID in
                                 Button {
-                                    viewModel.selectAgentModel(modelID)
+                                    selectAgentModel(modelID)
                                 } label: {
                                     Text(
                                         modelID == viewModel.currentAgentModelID
@@ -311,7 +311,7 @@ struct ChatComposer: View {
                         Section("Installed models") {
                             ForEach(localLibrary.models) { localModel in
                                 Button {
-                                    viewModel.selectAgentModel(localModel.repoID)
+                                    selectAgentModel(localModel.repoID)
                                 } label: {
                                     HStack {
                                         Text(modelMenuLabel(localModel.repoID))
@@ -333,7 +333,7 @@ struct ChatComposer: View {
                             ForEach(viewModel.cliProxyAPIModelIDs, id: \.self) { modelID in
                                 let routedModelID = "cliproxyapi::\(modelID)"
                                 Button {
-                                    viewModel.selectAgentModel(routedModelID)
+                                    selectAgentModel(routedModelID)
                                 } label: {
                                     HStack {
                                         Text(modelMenuLabel(modelID))
@@ -365,7 +365,7 @@ struct ChatComposer: View {
                     } else {
                         ForEach(viewModel.currentAgentAvailableModelIDs, id: \.self) { modelID in
                             Button {
-                                viewModel.selectAgentModel(modelID)
+                                selectAgentModel(modelID)
                             } label: {
                                 HStack {
                                     Text(modelMenuLabel(modelID))
@@ -387,7 +387,7 @@ struct ChatComposer: View {
                     }
                 }
                 Button {
-                    viewModel.refreshCurrentAgentModelCatalog(force: true)
+                    refreshAgentModels()
                 } label: {
                     Label("Refresh models", systemImage: "arrow.clockwise")
                 }
@@ -400,8 +400,8 @@ struct ChatComposer: View {
             }
             .menuStyle(.borderlessButton)
             .fixedSize()
-            .disabled(viewModel.hasPendingRequests)
-            .help("Select model for this Agent session")
+            .disabled(agentPickerIsDisabled)
+            .help(agentModelPickerHelp)
         }
     }
 
@@ -429,6 +429,11 @@ struct ChatComposer: View {
     }
 
     private var selectedAgentModelLabel: String {
+        if model.modelSwitchInProgress,
+           viewModel.currentAgentHarnessKind != .fx,
+           viewModel.currentAgentProvider == .gateway {
+            return "Switching models..."
+        }
         if viewModel.isLoadingAgentModels {
             return "Loading models..."
         }
@@ -449,6 +454,25 @@ struct ChatComposer: View {
             return "Loading models..."
         }
         return viewModel.agentModelCatalogError ?? "No models available"
+    }
+
+    private var agentPickerIsDisabled: Bool {
+        viewModel.hasPendingRequests
+            || (viewModel.currentAgentHarnessKind != .fx
+                && viewModel.currentAgentProvider == .gateway
+                && model.modelSwitchInProgress)
+    }
+
+    private var agentModelPickerHelp: String {
+        if viewModel.hasPendingRequests {
+            return "Model switching is unavailable while requests are active or queued"
+        }
+        if model.modelSwitchInProgress,
+           viewModel.currentAgentHarnessKind != .fx,
+           viewModel.currentAgentProvider == .gateway {
+            return "Restarting Local Gateway with the selected model"
+        }
+        return "Select model for this Agent session"
     }
 
     private var selectedModelID: String? {
@@ -540,6 +564,22 @@ struct ChatComposer: View {
             model.settings.thinkingEnabled = false
         }
         model.switchLanguageModel(to: localModel.repoID)
+    }
+
+    private func selectAgentModel(_ modelID: String) {
+        viewModel.selectAgentModel(modelID)
+        guard viewModel.currentAgentHarnessKind != .fx,
+              viewModel.currentAgentProvider == .gateway,
+              localLibrary.models.contains(where: { $0.repoID == modelID })
+        else { return }
+        model.switchLanguageModel(to: modelID)
+    }
+
+    private func refreshAgentModels() {
+        if viewModel.currentAgentProvider == .gateway {
+            localLibrary.scan(path: model.settings.modelSearchPath)
+        }
+        viewModel.refreshCurrentAgentModelCatalog(force: true)
     }
 
     private func applyReasoningLevel(_ level: ChatReasoningLevel) {

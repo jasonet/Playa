@@ -36,11 +36,11 @@ class CommunityReleaseToolingTests(unittest.TestCase):
         self.assertIn('local entitlements=""', script)
         self.assertIn('if [[ -n "$entitlements" ]]; then', script)
 
-    def test_packager_exposes_fixed_034_artifact_name_and_size_limit(self) -> None:
+    def test_packager_exposes_fixed_035_artifact_name_and_size_limit(self) -> None:
         result = subprocess.run(
             [str(PACKAGE_SCRIPT), "--help"], check=True, capture_output=True, text=True
         )
-        self.assertIn("Playa-0.3.4-macos-arm64-unnotarized.dmg", result.stdout)
+        self.assertIn("Playa-0.3.5-macos-arm64-unnotarized.dmg", result.stdout)
         self.assertIn("314572800", result.stdout)
 
 

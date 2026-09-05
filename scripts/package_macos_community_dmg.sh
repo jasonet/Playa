@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-readonly DEFAULT_NAME="Playa-0.3.4-macos-arm64-unnotarized.dmg"
+readonly DEFAULT_NAME="Playa-0.3.5-macos-arm64-unnotarized.dmg"
 readonly DEFAULT_MAX_BYTES=314572800
 
 usage() {
@@ -68,7 +68,7 @@ esac
 [[ "$output" == *.dmg ]] || fail "--output must end in .dmg"
 
 version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")"
-[[ "$version" == "0.3.4" ]] || fail "app version is $version, expected 0.3.4"
+[[ "$version" == "0.3.5" ]] || fail "app version is $version, expected 0.3.5"
 main_executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Contents/Info.plist")"
 file "$app/Contents/MacOS/$main_executable" | grep -q 'arm64' || fail "main executable is not arm64"
 file "$app/Contents/MacOS/$main_executable" | grep -qv 'x86_64' || fail "main executable unexpectedly contains x86_64"
@@ -86,7 +86,7 @@ mkdir -p "$(dirname "$output")"
 rm -f "$output"
 
 hdiutil create \
-    -volname "Playa 0.3.4" \
+    -volname "Playa 0.3.5" \
     -srcfolder "$stage" \
     -format UDZO \
     -imagekey zlib-level=9 \

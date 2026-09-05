@@ -97,6 +97,7 @@ struct ControlPanelView: View {
     @State private var isNewChatHovering = false
     @State private var isErrorLogExpanded = false
     @State private var activeModelSearchPage: ModelSearchPage?
+    @State private var showsAgentTypePicker = false
     private let sidebarItemInsets = EdgeInsets(top: -1, leading: 0, bottom: -1, trailing: 0)
 
     var body: some View {
@@ -112,6 +113,12 @@ struct ControlPanelView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("This will launch the model server. Existing chats will reconnect once the server is ready.")
+        }
+        .sheet(isPresented: $showsAgentTypePicker) {
+            AgentTypePickerSheet { harnessKind in
+                showsAgentTypePicker = false
+                chooseAgentDirectory(harnessKind: harnessKind)
+            }
         }
         .frame(minWidth: 1040, minHeight: 600)
         .background {
@@ -288,7 +295,7 @@ struct ControlPanelView: View {
                             }
                         }
                         Button("New Agent Session…", systemImage: "folder") {
-                            chooseAgentDirectory()
+                            showsAgentTypePicker = true
                         }
                     } label: {
                         Image(systemName: "square.and.pencil")
@@ -299,7 +306,7 @@ struct ControlPanelView: View {
                     .menuStyle(.borderlessButton)
                     .menuIndicator(.hidden)
                     .fixedSize()
-                    .help("Create a chat or directory-backed fx agent session")
+                    .help("Create a chat or choose Fx, Deep, or Prime Agent")
                     .padding(.trailing, 4)
                     .onHover { isNewChatHovering = $0 }
                 }
@@ -777,7 +784,7 @@ struct ControlPanelView: View {
         applySidebarSelection(chat.currentSessionID.map(ControlPanelSidebarSelection.chat) ?? .tab(.chat))
     }
 
-    private func chooseAgentDirectory() {
+    private func chooseAgentDirectory(harnessKind: AgentHarnessKind) {
         let panel = NSOpenPanel()
         panel.title = "Choose Agent Workspace"
         panel.prompt = "Create Agent Session"
@@ -789,7 +796,8 @@ struct ControlPanelView: View {
 
         chat.createAgentSession(
             workingDirectory: directory,
-            initialLocalModelID: model.settings.normalized().languageModelID
+            initialLocalModelID: model.settings.normalized().languageModelID,
+            harnessKind: harnessKind
         )
         applySidebarSelection(chat.currentSessionID.map(ControlPanelSidebarSelection.chat) ?? .tab(.chat))
     }
@@ -934,6 +942,111 @@ private struct ControlPanelSidebarSurfaceReader: NSViewRepresentable {
     }
 }
 
+private struct AgentTypePickerSheet: View {
+    let onSelect: (AgentHarnessKind) -> Void
+    @Environment(\.dismiss) private var dismiss
+    @State private var hoveredKind: AgentHarnessKind?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Select Agent Harness")
+                        .font(.title2.weight(.semibold))
+                    Text("Choose the execution engine for your new agent session, then select its workspace folder.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button("Cancel") { dismiss() }
+                    .keyboardShortcut(.cancelAction)
+            }
+
+            VStack(spacing: 12) {
+                ForEach(AgentHarnessKind.allCases) { kind in
+                    Button {
+                        onSelect(kind)
+                    } label: {
+                        HStack(alignment: .top, spacing: 14) {
+                            Image(systemName: kind.systemImage)
+                                .font(.system(size: 24, weight: .semibold))
+                                .foregroundStyle(Color.accentColor)
+                                .frame(width: 36, height: 36)
+                                .background(Color.accentColor.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack(spacing: 6) {
+                                    Text(kind.displayName)
+                                        .font(.headline)
+                                    if kind == .prime {
+                                        Text("MULTI-AGENT")
+                                            .font(.system(size: 9, weight: .bold))
+                                            .padding(.horizontal, 5)
+                                            .padding(.vertical, 2)
+                                            .background(Color.indigo.opacity(0.18), in: Capsule())
+                                            .foregroundStyle(Color.indigo)
+                                    } else if kind == .deep {
+                                        Text("AUTONOMOUS")
+                                            .font(.system(size: 9, weight: .bold))
+                                            .padding(.horizontal, 5)
+                                            .padding(.vertical, 2)
+                                            .background(Color.accentColor.opacity(0.18), in: Capsule())
+                                            .foregroundStyle(Color.accentColor)
+                                    }
+                                }
+
+                                Text(kind.detail)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+
+                                Text(capabilitiesDescription(for: kind))
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                                    .padding(.top, 2)
+                            }
+
+                            Spacer(minLength: 0)
+
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.tertiary)
+                                .padding(.top, 8)
+                        }
+                        .padding(14)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .buttonStyle(.plain)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(hoveredKind == kind ? Color.accentColor.opacity(0.08) : Color(nsColor: .controlBackgroundColor))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(hoveredKind == kind ? Color.accentColor.opacity(0.4) : Color.primary.opacity(0.08), lineWidth: 1)
+                    )
+                    .onHover { isHovering in
+                        hoveredKind = isHovering ? kind : nil
+                    }
+                }
+            }
+        }
+        .padding(22)
+        .frame(width: 580)
+    }
+
+    private func capabilitiesDescription(for kind: AgentHarnessKind) -> String {
+        switch kind {
+        case .fx:
+            "Uses external fx binary via ACP. Supports Local and OpenComputer cloud microVM modes."
+        case .deep:
+            "In-process Plan → Act → Observe → Reflect loop. Autonomous single-agent execution in workspace."
+        case .prime:
+            "Dynamic specialist decomposition. Up to 4 subagents, 2-way read concurrency, serialized writes."
+        }
+    }
+}
+
 private struct ControlPanelWindowStateReader: NSViewRepresentable {
     @Binding var isFullScreen: Bool
     @Binding var topContentInset: CGFloat
@@ -1036,6 +1149,7 @@ private struct ControlPanelRecentSession: Identifiable, Equatable {
     let createdAt: Date
     let updatedAt: Date
     let isAgent: Bool
+    let harnessKind: AgentHarnessKind?
 
     init(chat session: ChatSessionSummary) {
         id = .chat(session.id)
@@ -1043,6 +1157,7 @@ private struct ControlPanelRecentSession: Identifiable, Equatable {
         createdAt = session.createdAt
         updatedAt = session.updatedAt
         isAgent = session.isAgent
+        harnessKind = session.harnessKind
     }
 
     init(imageGeneration session: ImageGenerationSessionSummary) {
@@ -1051,6 +1166,7 @@ private struct ControlPanelRecentSession: Identifiable, Equatable {
         createdAt = session.createdAt
         updatedAt = session.updatedAt
         isAgent = false
+        harnessKind = nil
     }
 
     var selection: ControlPanelSidebarSelection {
@@ -1210,9 +1326,10 @@ private struct ControlPanelRecentSessionRow: View {
                         .accessibilityHidden(true)
 
                     if recent.isAgent {
-                        Image(systemName: "terminal")
+                        Image(systemName: recent.harnessKind?.systemImage ?? "terminal")
                             .font(.system(size: 10, weight: .medium))
                             .foregroundStyle(.secondary)
+                            .help(recent.harnessKind?.displayName ?? "Agent Session")
                     }
 
                     Text(recent.title)

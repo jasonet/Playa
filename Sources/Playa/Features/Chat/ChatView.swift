@@ -18,6 +18,12 @@ struct ChatQueuedPrompt: Identifiable, Equatable {
     let position: Int
 }
 
+struct NativeAgentApprovalRequest: Identifiable, Equatable {
+    let id: UUID
+    let operation: String
+    let reason: String
+}
+
 struct ChatView: View {
     private enum Layout {
         static let conversationMaxWidth: CGFloat = 680
@@ -46,27 +52,52 @@ struct ChatView: View {
             VStack(spacing: 0) {
                 if chat.currentSessionIsAgent, let workingDirectory = chat.currentWorkingDirectory {
                     HStack(spacing: 8) {
-                        Label("fx Agent", systemImage: "terminal")
+                        Label(chat.currentAgentHarnessKind.displayName, systemImage: chat.currentAgentHarnessKind.systemImage)
                             .font(.caption.weight(.semibold))
-                        Text(workingDirectory)
-                            .font(.caption.monospaced())
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                            .truncationMode(.middle)
-                        Spacer()
 
-                        Picker("Mode", selection: Binding(
-                            get: { chat.currentAgentExecutionMode },
-                            set: { chat.selectAgentExecutionMode($0) }
-                        )) {
-                            ForEach(FxAgentExecutionMode.allCases) { mode in
-                                Label(mode.displayName, systemImage: mode.systemImage)
-                                    .tag(mode)
+                        Button {
+                            let url = URL(fileURLWithPath: workingDirectory)
+                            NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "folder")
+                                    .font(.caption2)
+                                Text(workingDirectory)
+                                    .font(.caption.monospaced())
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
                             }
                         }
-                        .pickerStyle(.segmented)
-                        .controlSize(.small)
-                        .fixedSize()
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.secondary)
+                        .help("Reveal workspace folder in Finder")
+                        .contextMenu {
+                            Button("Reveal in Finder") {
+                                let url = URL(fileURLWithPath: workingDirectory)
+                                NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
+                            }
+                            Button("Copy Workspace Path") {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(workingDirectory, forType: .string)
+                            }
+                        }
+
+                        Spacer()
+
+                        if chat.currentAgentHarnessKind == .fx {
+                            Picker("Mode", selection: Binding(
+                                get: { chat.currentAgentExecutionMode },
+                                set: { chat.selectAgentExecutionMode($0) }
+                            )) {
+                                ForEach(FxAgentExecutionMode.allCases) { mode in
+                                    Label(mode.displayName, systemImage: mode.systemImage)
+                                        .tag(mode)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                            .controlSize(.small)
+                            .fixedSize()
+                        }
                     }
                     .padding(.horizontal, 18)
                     .padding(.vertical, 8)
@@ -149,6 +180,15 @@ struct ChatView: View {
                 chat.refreshCLIProxyAPIModels(force: true)
             }
         }
+        .alert("Allow Agent operation?", isPresented: Binding(
+            get: { chat.pendingNativeAgentApproval != nil },
+            set: { if !$0 { chat.resolveNativeAgentApproval(allowed: false) } }
+        ), presenting: chat.pendingNativeAgentApproval) { _ in
+            Button("Deny", role: .cancel) { chat.resolveNativeAgentApproval(allowed: false) }
+            Button("Allow") { chat.resolveNativeAgentApproval(allowed: true) }
+        } message: { request in
+            Text("\(request.operation)\n\n\(request.reason)")
+        }
     }
 
     private var selectedModelID: String? {
@@ -169,7 +209,7 @@ struct ChatView: View {
 
     private var canCompose: Bool {
         if chat.currentSessionIsAgent {
-            return !chat.currentAgentProvider.requiresLocalGateway
+            return !chat.currentAgentRequiresLocalGateway
                 || (isServerReady && chat.currentAgentModelID?.isEmpty == false)
         }
         return isServerReady
@@ -396,7 +436,9 @@ final class ChatViewModel: ObservableObject {
     @Published private(set) var sendingStartedAt: Date?
     @Published private(set) var scrollToken = 0
     @Published private(set) var currentAgentExecutionMode: FxAgentExecutionMode = .local
+    @Published private(set) var currentAgentHarnessKind: AgentHarnessKind = .fx
     @Published private(set) var currentAgentProvider: FxAgentProvider = .gateway
+    @Published private(set) var pendingNativeAgentApproval: NativeAgentApprovalRequest?
     @Published private(set) var currentAgentModelID: String?
     @Published private(set) var currentAgentAvailableModelIDs: [String] = []
     @Published private(set) var cliProxyAPIModelIDs: [String] = []
@@ -414,6 +456,7 @@ final class ChatViewModel: ObservableObject {
     private var currentSession: ChatSession?
     private var liveDecodeRateRefreshDates: [UUID: Date] = [:]
     private weak var appModel: PlayaModel?
+    private var nativeAgentApprovalContinuation: CheckedContinuation<Bool, Never>?
 
     init() {
         storedSessions = sessionStore.loadSessions()
@@ -433,6 +476,15 @@ final class ChatViewModel: ObservableObject {
     var currentSessionIsAgent: Bool { currentSession?.isAgent == true }
 
     var currentWorkingDirectory: String? { currentSession?.workingDirectory }
+
+    var availableAgentProviders: [FxAgentProvider] {
+        currentAgentHarnessKind == .fx ? FxAgentProvider.allCases : [.gateway, .cliProxyAPI]
+    }
+
+    var currentAgentRequiresLocalGateway: Bool {
+        currentAgentProvider == .gateway
+            || (currentAgentHarnessKind == .fx && currentAgentProvider == .cliProxyAPI)
+    }
 
     var isCurrentSessionSending: Bool {
         guard let activeRequestSessionID else {
@@ -477,7 +529,7 @@ final class ChatViewModel: ObservableObject {
 
     func canSend(isRunning: Bool, selectedModelID: String?) -> Bool {
         if currentSessionIsAgent {
-            let providerIsAvailable = !currentAgentProvider.requiresLocalGateway || isRunning
+            let providerIsAvailable = !currentAgentRequiresLocalGateway || isRunning
             return providerIsAvailable
                 && currentAgentModelID?.isEmpty == false
                 && !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -490,7 +542,7 @@ final class ChatViewModel: ObservableObject {
 
     func unavailableReason(isRunning: Bool, selectedModelID: String?) -> String? {
         if currentSessionIsAgent {
-            if currentAgentProvider.requiresLocalGateway, !isRunning {
+            if currentAgentRequiresLocalGateway, !isRunning {
                 return "Local Gateway is stopped."
             }
             if isLoadingAgentModels {
@@ -545,7 +597,11 @@ final class ChatViewModel: ObservableObject {
         applyCurrentSession(session)
     }
 
-    func createAgentSession(workingDirectory: URL, initialLocalModelID: String?) {
+    func createAgentSession(
+        workingDirectory: URL,
+        initialLocalModelID: String?,
+        harnessKind: AgentHarnessKind = .fx
+    ) {
         persistCurrentSession(updateTimestamp: false)
         let createdAt = Date()
         let session = ChatSession(
@@ -557,7 +613,8 @@ final class ChatViewModel: ObservableObject {
             kind: .agent,
             workingDirectory: workingDirectory.standardizedFileURL.path,
             agentProvider: .gateway,
-            agentModelID: initialLocalModelID
+            agentModelID: initialLocalModelID,
+            agentHarnessKind: harnessKind
         )
         storedSessions.append(session)
         pruneRedundantEmptySessions()
@@ -698,9 +755,35 @@ final class ChatViewModel: ObservableObject {
         bumpScroll()
 
         let executionMode = session.agentExecutionMode ?? currentAgentExecutionMode
+        let harnessKind = session.resolvedAgentHarnessKind
         activeTask = Task { @MainActor [weak self] in
             guard let self else { return }
             do {
+                if harnessKind != .fx {
+                    try await self.runNativeAgent(
+                        kind: harnessKind,
+                        prompt: prompt,
+                        workspace: URL(fileURLWithPath: workingDirectory, isDirectory: true),
+                        provider: provider,
+                        modelID: modelID,
+                        settings: settings,
+                        assistantMessageID: assistantMessage.id,
+                        sessionID: session.id
+                    )
+                    self.finishAssistantMessage(
+                        assistantMessage.id,
+                        in: session.id,
+                        fallbackContent: "Agent completed without a text response.",
+                        fallbackReasoningContent: nil,
+                        responseMetrics: nil,
+                        isCancelled: false
+                    )
+                    self.activeRequestSessionID = nil
+                    self.sendingStartedAt = nil
+                    self.activeTask = nil
+                    self.bumpScroll()
+                    return
+                }
                 let result = try await FxAgentHarness.run(
                     prompt: prompt,
                     workspace: URL(fileURLWithPath: workingDirectory, isDirectory: true),
@@ -753,6 +836,179 @@ final class ChatViewModel: ObservableObject {
         }
     }
 
+    private func runNativeAgent(
+        kind: AgentHarnessKind,
+        prompt: String,
+        workspace: URL,
+        provider: FxAgentProvider,
+        modelID: String,
+        settings: PlayaSettings,
+        assistantMessageID: UUID,
+        sessionID: UUID
+    ) async throws {
+        let complete: NativeAgentRuntime.Complete = { [weak self] messages in
+            guard let self else { throw CancellationError() }
+            if provider == .cliProxyAPI {
+                return try await self.completeCLIProxyAPIChat(
+                    messages: messages,
+                    modelID: modelID,
+                    settings: settings
+                )
+            }
+            let resolvedModelID: String
+            if provider == .gateway,
+               let loaded = await self.appModel?.loadedServerModelID {
+                resolvedModelID = loaded
+            } else {
+                resolvedModelID = modelID
+            }
+            let request = MLXChatCompletionRequest(
+                model: resolvedModelID,
+                messages: messages,
+                maxTokens: settings.maxTokens,
+                temperature: settings.temperature,
+                topK: settings.topK,
+                topP: settings.topP,
+                minP: settings.minP,
+                repetitionPenalty: settings.repetitionPenaltyEnabled ? settings.repetitionPenalty : nil,
+                enableThinking: settings.thinkingEnabled,
+                thinkingBudget: settings.thinkingEnabled && settings.thinkingBudgetEnabled ? settings.thinkingBudget : nil
+            )
+            return try await self.client.completeChat(request).content
+        }
+        let approval: NativeAgentRuntime.Approval = { [weak self] operation, reason in
+            guard let self else { return false }
+            return await self.requestNativeAgentApproval(operation: operation, reason: reason)
+        }
+        let events: NativeAgentRuntime.Event = { [weak self] event in
+            await self?.applyNativeAgentEvent(event, assistantMessageID: assistantMessageID, sessionID: sessionID)
+        }
+        switch kind {
+        case .deep:
+            try await DeepAgentHarness.run(prompt: prompt, workspace: workspace, complete: complete, approval: approval, onEvent: events)
+        case .prime:
+            try await PrimeAgentHarness.run(prompt: prompt, workspace: workspace, complete: complete, approval: approval, onEvent: events)
+        case .fx:
+            break
+        }
+    }
+
+    private func completeCLIProxyAPIChat(
+        messages: [MLXChatMessage],
+        modelID: String,
+        settings: PlayaSettings
+    ) async throws -> String {
+        let baseURL = Self.resolvedCLIProxyBaseURL()
+            .trimmingCharacters(in: CharacterSet(charactersIn: "/ \t\n\r"))
+        let endpoint = baseURL.hasSuffix("/v1")
+            ? "\(baseURL)/chat/completions"
+            : "\(baseURL)/v1/chat/completions"
+        guard let url = URL(string: endpoint) else {
+            throw URLError(.badURL)
+        }
+
+        var payload: [String: Any] = [
+            "model": Self.unroutedCLIProxyAPIModelID(modelID),
+            "messages": messages.map { message in
+                [
+                    "role": message.role,
+                    "content": message.textContent ?? "",
+                ]
+            },
+            "stream": false,
+        ]
+        if settings.maxTokens > 0 {
+            payload["max_tokens"] = settings.maxTokens
+        }
+        payload["temperature"] = settings.temperature
+        payload["top_p"] = settings.topP
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 600
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        let apiKey = Self.resolvedCLIProxyAPIKey()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if !apiKey.isEmpty {
+            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        }
+        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.timeoutIntervalForRequest = 600
+        configuration.timeoutIntervalForResource = 600
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.connectionProxyDictionary = [:]
+        let (data, response) = try await URLSession(configuration: configuration).data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw PlayaChatError.invalidResponse
+        }
+        guard (200..<300).contains(http.statusCode) else {
+            throw PlayaChatError.httpStatus(
+                http.statusCode,
+                String(decoding: data, as: UTF8.self)
+            )
+        }
+        guard let object = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let choices = object["choices"] as? [[String: Any]],
+              let message = choices.first?["message"] as? [String: Any]
+        else {
+            throw PlayaChatError.invalidResponse
+        }
+
+        let content: String
+        if let text = message["content"] as? String {
+            content = text
+        } else if let parts = message["content"] as? [[String: Any]] {
+            content = parts.compactMap { $0["text"] as? String }.joined(separator: "\n")
+        } else {
+            content = ""
+        }
+        if !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return content
+        }
+        if let reasoning = message["reasoning_content"] as? String,
+           !reasoning.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return reasoning
+        }
+        throw PlayaChatError.missingAssistantContent
+    }
+
+    private func requestNativeAgentApproval(operation: String, reason: String) async -> Bool {
+        await withCheckedContinuation { continuation in
+            nativeAgentApprovalContinuation?.resume(returning: false)
+            nativeAgentApprovalContinuation = continuation
+            pendingNativeAgentApproval = NativeAgentApprovalRequest(id: UUID(), operation: operation, reason: reason)
+        }
+    }
+
+    func resolveNativeAgentApproval(allowed: Bool) {
+        pendingNativeAgentApproval = nil
+        nativeAgentApprovalContinuation?.resume(returning: allowed)
+        nativeAgentApprovalContinuation = nil
+    }
+
+    private func applyNativeAgentEvent(
+        _ event: AgentHarnessEvent,
+        assistantMessageID: UUID,
+        sessionID: UUID
+    ) {
+        updateMessage(assistantMessageID, in: sessionID) { message in
+            switch event {
+            case .text(let text): message.content += text
+            case .status(let status):
+                if !message.reasoningContent.isEmpty { message.reasoningContent += "\n" }
+                message.reasoningContent += "• \(status)"
+            case .image(let attachment):
+                if !message.imageAttachments.contains(where: { $0.base64Data == attachment.base64Data }) { message.imageAttachments.append(attachment) }
+            case .tasks(let tasks): message.agentTasks = tasks
+            }
+        }
+        if currentSessionID == sessionID { bumpScroll() }
+    }
+
     private func applyAgentEvent(
         _ event: FxAgentEvent,
         assistantMessageID: UUID,
@@ -790,6 +1046,7 @@ final class ChatViewModel: ObservableObject {
     }
 
     func selectAgentProvider(_ provider: FxAgentProvider) {
+        guard availableAgentProviders.contains(provider) else { return }
         guard currentSessionIsAgent,
               provider != currentAgentProvider,
               !hasPendingRequests
@@ -840,6 +1097,17 @@ final class ChatViewModel: ObservableObject {
         let provider = currentAgentProvider
         if provider == .cliProxyAPI {
             refreshCLIProxyAPIModels(force: force)
+            return
+        }
+        guard currentAgentHarnessKind == .fx else {
+            agentConfigurationTask?.cancel()
+            agentConfigurationTask = nil
+            currentAgentAvailableModelIDs = []
+            isLoadingAgentModels = false
+            agentModelCatalogError = nil
+            if force {
+                refreshErrorMessage = nil
+            }
             return
         }
         // The local gateway advertises the model that is actually loaded by the
@@ -1527,10 +1795,17 @@ final class ChatViewModel: ObservableObject {
             upsertStoredSession(appliedSession)
             sessionStore.saveSession(appliedSession)
         }
+        if appliedSession.resolvedAgentHarnessKind != .fx,
+           appliedSession.fxSessionID != nil {
+            appliedSession.fxSessionID = nil
+            upsertStoredSession(appliedSession)
+            sessionStore.saveSession(appliedSession)
+        }
         currentSession = appliedSession
         currentSessionID = appliedSession.id
         messages = appliedSession.messages
         currentAgentExecutionMode = appliedSession.agentExecutionMode ?? .local
+        currentAgentHarnessKind = appliedSession.resolvedAgentHarnessKind
         currentAgentProvider = appliedSession.agentProvider ?? .gateway
         currentAgentModelID = appliedSession.agentModelID
         currentAgentAvailableModelIDs = []
@@ -1641,6 +1916,100 @@ final class ChatViewModel: ObservableObject {
     }
 }
 
+private struct AgentTaskPanel: View {
+    let tasks: [AgentTaskSnapshot]
+    @State private var isExpanded: Bool = true
+
+    var body: some View {
+        DisclosureGroup(isExpanded: $isExpanded) {
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(tasks) { task in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 7) {
+                            taskIcon(for: task.state)
+                            Text(task.role)
+                                .font(.system(size: 11, weight: .bold))
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 1.5)
+                                .background(Color.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 4))
+                            Text(task.title)
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(.primary)
+                                .lineLimit(1)
+                            Spacer()
+                            if let elapsed = task.elapsedSeconds {
+                                Text("\(elapsed, specifier: "%.1f")s")
+                                    .font(.caption2.monospacedDigit())
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                        if !task.detail.isEmpty {
+                            Text(task.detail)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .textSelection(.enabled)
+                                .lineLimit(task.state == .completed ? 6 : 3)
+                        }
+                    }
+                    .padding(8)
+                    .background(Color(nsColor: .controlBackgroundColor).opacity(0.7), in: RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.primary.opacity(0.06), lineWidth: 0.5)
+                    )
+                }
+            }
+            .padding(.top, 8)
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "person.3.sequence.fill")
+                    .foregroundStyle(Color.accentColor)
+                Text("Prime Subagents (\(completedCount)/\(tasks.count))")
+                    .font(.caption.weight(.semibold))
+                if hasRunningTasks {
+                    ProgressView()
+                        .controlSize(.mini)
+                }
+            }
+        }
+        .padding(10)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.accentColor.opacity(0.15), lineWidth: 1)
+        )
+    }
+
+    private var completedCount: Int {
+        tasks.filter { $0.state == .completed }.count
+    }
+
+    private var hasRunningTasks: Bool {
+        tasks.contains { $0.state == .running }
+    }
+
+    @ViewBuilder
+    private func taskIcon(for state: AgentTaskState) -> some View {
+        switch state {
+        case .waiting:
+            Image(systemName: "clock")
+                .foregroundStyle(.secondary)
+                .font(.caption)
+        case .running:
+            ProgressView()
+                .controlSize(.mini)
+        case .completed:
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundStyle(.green)
+                .font(.caption)
+        case .failed:
+            Image(systemName: "xmark.octagon.fill")
+                .foregroundStyle(.red)
+                .font(.caption)
+        }
+    }
+}
+
 private struct ChatMessageRow: View {
     private static let maximumUserBubbleWidth: CGFloat = 560
 
@@ -1683,6 +2052,10 @@ private struct ChatMessageRow: View {
                         isThinking: message.isStreaming && message.content.isEmpty,
                         thinkingDuration: message.thinkingDuration
                     )
+                }
+
+                if !message.agentTasks.isEmpty {
+                    AgentTaskPanel(tasks: message.agentTasks)
                 }
 
                 if showsTextContent {

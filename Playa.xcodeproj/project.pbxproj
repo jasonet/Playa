@@ -14,8 +14,10 @@
 		27073D8F62EF9FFF5EF08095 /* ModelProviderIcons in Resources */ = {isa = PBXBuildFile; fileRef = D9CBC2FC7B2D716AD52BA39A /* ModelProviderIcons */; };
 		2B5A1986FB63358AFFE5816F /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = A687E0430048ACF12D420B13 /* Textual */; };
 		2F041183B24CCBE86ABCB4E9 /* ChatConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC686B53E335E0053A7CC05 /* ChatConfigurationView.swift */; };
+		3CF8838FE52CF4E0A68A6AFD /* PrimeAgentHarness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EB7399FE4A8E23A7F8DA8A0 /* PrimeAgentHarness.swift */; };
 		41C835312DD1344671D62493 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F0CB726E5C9799AE519AFD /* StatsView.swift */; };
 		4776A6811D83F1375ACFF445 /* PlayaImageClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B776E45404D84AA91B03C0F /* PlayaImageClient.swift */; };
+		510315A0E4ECEC3623F44AB8 /* DeepAgentHarness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D7D13708E91AFB941598D2C /* DeepAgentHarness.swift */; };
 		52AF1E21034D02F2359AB521 /* GeminiOmniView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2C8DABB17ABE359F29972D0 /* GeminiOmniView.swift */; };
 		5395A8ABF53B53D3C7A039D7 /* PlayaServerKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = D122651671CC762B287EBB77 /* PlayaServerKit.swift */; };
 		588241A534C50B77F136A460 /* ServerErrorAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC8A77B2E3F848BBE355D52 /* ServerErrorAnalyzer.swift */; };
@@ -28,9 +30,11 @@
 		79088962E4796977F173DC0B /* ControlPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF48538BAF221F0313C05202 /* ControlPanelView.swift */; };
 		7A2279F36C0C97C47F5DA48F /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 337C537BF50C30B4B1080EA2 /* WelcomeView.swift */; };
 		7B18EC40BB3F9A6F27C945D2 /* ModelHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4666A69DABC85688BB564899 /* ModelHistoryStore.swift */; };
+		7BC371B6E443EFE5804E6BAB /* NativeAgentTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9523E755362E1FFDD0C1DC64 /* NativeAgentTools.swift */; };
 		7E026EB3BC080DFEBF4D4835 /* ChatSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9C6A8339EEF71EEC5B9A8B /* ChatSessionStore.swift */; };
 		8066A30BD9C29041DC2DAFD4 /* ModelSearchWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E985D77E91F0FDE236F43BD /* ModelSearchWebView.swift */; };
 		813854C923D7315BE255108D /* ImageGenerationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9190021845EED1B99734B5EC /* ImageGenerationViewModel.swift */; };
+		9B32E5D4151641BFC0021DDD /* NativeAgentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB71BE5C23D1421234ACD15E /* NativeAgentRuntime.swift */; };
 		9F8D1AFA9FCBA0147473B660 /* PlayaAnalyticsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46576176DD18BA1068CD20F4 /* PlayaAnalyticsStore.swift */; };
 		A22522081F1660D87EC44745 /* ModelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5465B0F1ED479415E9EF3059 /* ModelsView.swift */; };
 		A46572AE8492F55F44F2D722 /* IntegrationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0F9AA73F9D3A7485BFAC39 /* IntegrationsView.swift */; };
@@ -92,20 +96,24 @@
 		5465B0F1ED479415E9EF3059 /* ModelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelsView.swift; sourceTree = "<group>"; };
 		593A3CBCB5977895C3CD5846 /* PlayaSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayaSettings.swift; sourceTree = "<group>"; };
 		5AC8A77B2E3F848BBE355D52 /* ServerErrorAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerErrorAnalyzer.swift; sourceTree = "<group>"; };
+		5D7D13708E91AFB941598D2C /* DeepAgentHarness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepAgentHarness.swift; sourceTree = "<group>"; };
 		600F4D8F241D666883C5DBBB /* IntegrationServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationServices.swift; sourceTree = "<group>"; };
 		7BEA44F4CE2E8BA00C64D30A /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		7DE9605882AA9AA43BCDD584 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7E985D77E91F0FDE236F43BD /* ModelSearchWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelSearchWebView.swift; sourceTree = "<group>"; };
+		7EB7399FE4A8E23A7F8DA8A0 /* PrimeAgentHarness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimeAgentHarness.swift; sourceTree = "<group>"; };
 		82C1259CB40A759FF4BD8F66 /* Playa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Playa.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B776E45404D84AA91B03C0F /* PlayaImageClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayaImageClient.swift; sourceTree = "<group>"; };
 		8CC686B53E335E0053A7CC05 /* ChatConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatConfigurationView.swift; sourceTree = "<group>"; };
 		9190021845EED1B99734B5EC /* ImageGenerationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageGenerationViewModel.swift; sourceTree = "<group>"; };
+		9523E755362E1FFDD0C1DC64 /* NativeAgentTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAgentTools.swift; sourceTree = "<group>"; };
 		9A61EC2441BB9D24A75C0DA3 /* HuggingFaceHub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HuggingFaceHub.swift; sourceTree = "<group>"; };
 		A104290A132F99A2800DB379 /* FxAgentHarness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FxAgentHarness.swift; sourceTree = "<group>"; };
 		A282C0B1CD8E6414B08FAEBB /* LICENSES.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSES.txt; sourceTree = "<group>"; };
 		A6DF4DDAF058866ED2CDDE61 /* PlayaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayaModel.swift; sourceTree = "<group>"; };
 		AF48538BAF221F0313C05202 /* ControlPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlPanelView.swift; sourceTree = "<group>"; };
 		C2F0CB726E5C9799AE519AFD /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
+		CB71BE5C23D1421234ACD15E /* NativeAgentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeAgentRuntime.swift; sourceTree = "<group>"; };
 		CB9C6A8339EEF71EEC5B9A8B /* ChatSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSessionStore.swift; sourceTree = "<group>"; };
 		D122651671CC762B287EBB77 /* PlayaServerKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayaServerKit.swift; sourceTree = "<group>"; };
 		D155489126C48836D24EB552 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -222,7 +230,11 @@
 				8CC686B53E335E0053A7CC05 /* ChatConfigurationView.swift */,
 				CB9C6A8339EEF71EEC5B9A8B /* ChatSessionStore.swift */,
 				16B1831BE9E8ACA734FEC70B /* ChatView.swift */,
+				5D7D13708E91AFB941598D2C /* DeepAgentHarness.swift */,
 				A104290A132F99A2800DB379 /* FxAgentHarness.swift */,
+				CB71BE5C23D1421234ACD15E /* NativeAgentRuntime.swift */,
+				9523E755362E1FFDD0C1DC64 /* NativeAgentTools.swift */,
+				7EB7399FE4A8E23A7F8DA8A0 /* PrimeAgentHarness.swift */,
 			);
 			path = Chat;
 			sourceTree = "<group>";
@@ -455,6 +467,7 @@
 				ECB3DCE4A2241B36F6EFC220 /* ChatView.swift in Sources */,
 				79088962E4796977F173DC0B /* ControlPanelView.swift in Sources */,
 				F5260B29EA57A91DBD231785 /* DashboardViewModel.swift in Sources */,
+				510315A0E4ECEC3623F44AB8 /* DeepAgentHarness.swift in Sources */,
 				75F8B734AD72AF1AC7CE4839 /* DeveloperView.swift in Sources */,
 				6D80B37E1A26E4EDA54CD476 /* Formatting.swift in Sources */,
 				EC624C50AED18C58BF93B175 /* FxAgentHarness.swift in Sources */,
@@ -472,9 +485,12 @@
 				7B18EC40BB3F9A6F27C945D2 /* ModelHistoryStore.swift in Sources */,
 				8066A30BD9C29041DC2DAFD4 /* ModelSearchWebView.swift in Sources */,
 				A22522081F1660D87EC44745 /* ModelsView.swift in Sources */,
+				9B32E5D4151641BFC0021DDD /* NativeAgentRuntime.swift in Sources */,
+				7BC371B6E443EFE5804E6BAB /* NativeAgentTools.swift in Sources */,
 				9F8D1AFA9FCBA0147473B660 /* PlayaAnalyticsStore.swift in Sources */,
 				CF7D90BE982808CD004ED534 /* PlayaModel.swift in Sources */,
 				FCFF3337899EB428A8129AD2 /* PlayaSettings.swift in Sources */,
+				3CF8838FE52CF4E0A68A6AFD /* PrimeAgentHarness.swift in Sources */,
 				588241A534C50B77F136A460 /* ServerErrorAnalyzer.swift in Sources */,
 				5CF2CDC99AE3DCD21CBB2B3C /* SoftwareUpdater.swift in Sources */,
 				41C835312DD1344671D62493 /* StatsView.swift in Sources */,
@@ -578,7 +594,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.3.4;
+				MARKETING_VERSION = 0.3.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(PLAYA_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = Playa;
 				SDKROOT = macosx;
@@ -692,7 +708,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 0.3.4;
+				MARKETING_VERSION = 0.3.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(PLAYA_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = Playa;
 				SDKROOT = macosx;

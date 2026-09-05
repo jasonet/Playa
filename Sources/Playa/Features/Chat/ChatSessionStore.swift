@@ -2,6 +2,54 @@ import Foundation
 import PlayaServerKit
 import UniformTypeIdentifiers
 
+enum AgentHarnessKind: String, CaseIterable, Codable, Identifiable, Sendable {
+    case fx
+    case deep
+    case prime
+
+    var id: Self { self }
+
+    var displayName: String {
+        switch self {
+        case .fx: "Fx Agent"
+        case .deep: "Deep Agent"
+        case .prime: "Prime Agent"
+        }
+    }
+
+    var detail: String {
+        switch self {
+        case .fx: "ACP-powered coding agent"
+        case .deep: "Plan, act, observe, and reflect"
+        case .prime: "Coordinate dynamic specialist agents"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .fx: "terminal"
+        case .deep: "brain.head.profile"
+        case .prime: "person.3.sequence"
+        }
+    }
+}
+
+enum AgentTaskState: String, Codable, Sendable {
+    case waiting
+    case running
+    case completed
+    case failed
+}
+
+struct AgentTaskSnapshot: Identifiable, Equatable, Codable, Sendable {
+    let id: String
+    var role: String
+    var title: String
+    var state: AgentTaskState
+    var detail: String
+    var elapsedSeconds: TimeInterval?
+}
+
 enum ChatSessionKind: String, Codable {
     case chat
     case agent
@@ -75,8 +123,10 @@ struct ChatSession: Identifiable, Equatable, Codable {
     var agentProvider: FxAgentProvider? = nil
     var agentModelID: String? = nil
     var agentExecutionMode: FxAgentExecutionMode? = nil
+    var agentHarnessKind: AgentHarnessKind? = nil
 
     var isAgent: Bool { kind == .agent && workingDirectory?.isEmpty == false }
+    var resolvedAgentHarnessKind: AgentHarnessKind { agentHarnessKind ?? .fx }
 
     var summary: ChatSessionSummary {
         ChatSessionSummary(
@@ -86,7 +136,8 @@ struct ChatSession: Identifiable, Equatable, Codable {
             updatedAt: updatedAt,
             messageCount: messages.count,
             kind: kind ?? .chat,
-            workingDirectory: workingDirectory
+            workingDirectory: workingDirectory,
+            harnessKind: isAgent ? resolvedAgentHarnessKind : nil
         )
     }
 
@@ -165,6 +216,7 @@ struct ChatSessionSummary: Identifiable, Equatable {
     let messageCount: Int
     let kind: ChatSessionKind
     let workingDirectory: String?
+    let harnessKind: AgentHarnessKind?
 
     var isAgent: Bool { kind == .agent }
 
@@ -194,6 +246,7 @@ struct ChatTranscriptMessage: Identifiable, Equatable, Codable {
     var thinkingDuration: TimeInterval?
     var imageAttachments: [ChatImageAttachment]
     var responseMetrics: ChatResponseMetrics?
+    var agentTasks: [AgentTaskSnapshot]
 
     init(
         id: UUID = UUID(),
@@ -206,7 +259,8 @@ struct ChatTranscriptMessage: Identifiable, Equatable, Codable {
         isThinkingEnabled: Bool = false,
         thinkingDuration: TimeInterval? = nil,
         imageAttachments: [ChatImageAttachment] = [],
-        responseMetrics: ChatResponseMetrics? = nil
+        responseMetrics: ChatResponseMetrics? = nil,
+        agentTasks: [AgentTaskSnapshot] = []
     ) {
         self.id = id
         self.role = role
@@ -219,6 +273,7 @@ struct ChatTranscriptMessage: Identifiable, Equatable, Codable {
         self.thinkingDuration = thinkingDuration
         self.imageAttachments = imageAttachments
         self.responseMetrics = responseMetrics
+        self.agentTasks = agentTasks
     }
 
     enum CodingKeys: String, CodingKey {
@@ -233,6 +288,7 @@ struct ChatTranscriptMessage: Identifiable, Equatable, Codable {
         case thinkingDuration
         case imageAttachments
         case responseMetrics
+        case agentTasks
     }
 
     init(from decoder: Decoder) throws {
@@ -248,6 +304,7 @@ struct ChatTranscriptMessage: Identifiable, Equatable, Codable {
         thinkingDuration = try container.decodeIfPresent(TimeInterval.self, forKey: .thinkingDuration)
         imageAttachments = try container.decodeIfPresent([ChatImageAttachment].self, forKey: .imageAttachments) ?? []
         responseMetrics = try container.decodeIfPresent(ChatResponseMetrics.self, forKey: .responseMetrics)
+        agentTasks = try container.decodeIfPresent([AgentTaskSnapshot].self, forKey: .agentTasks) ?? []
 
         if role == .error,
            content == PlayaChatError.missingAssistantContent.localizedDescription,
@@ -270,6 +327,7 @@ struct ChatTranscriptMessage: Identifiable, Equatable, Codable {
         try container.encodeIfPresent(thinkingDuration, forKey: .thinkingDuration)
         try container.encode(imageAttachments, forKey: .imageAttachments)
         try container.encodeIfPresent(responseMetrics, forKey: .responseMetrics)
+        try container.encode(agentTasks, forKey: .agentTasks)
     }
 
     var apiMessage: MLXChatMessage? {

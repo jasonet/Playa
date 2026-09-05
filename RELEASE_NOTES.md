@@ -1,29 +1,25 @@
-# Playa 0.3.4 Community Preview
+# Playa 0.3.5
 
-Playa 0.3.4 adds a downloadable Apple Silicon community build while preserving the complete bundled MLX and MLX-VLM Python runtime for offline inference after dependencies and model files have been downloaded.
+Playa 0.3.5 introduces native Agent Harness engines alongside Fx Agent, adds risk-tiered execution safety, and improves ACP server reliability.
 
 ## Highlights
 
-- Complete embedded MLX, MLX-VLM, Transformers, scientific Python, image, video, and audio runtime
-- Deterministic Release pruning of Python bytecode caches, third-party test suites, pip/ensurepip, IDLE, Tk demos, and development headers
-- Compressed arm64 DMG targeting no more than 300 MiB
-- One-click local MLX and MLX-VLM model serving on Apple Silicon
-- TB-scale local model discovery, filtering, downloads, history, launch, and removal
-- EasyCLIProxyAPI provider configuration and model discovery
-- Classic streaming chat, Fx Agent, OpenComputer execution, and conversational image workflows
+- **Deep Agent Harness**: Native in-process autonomous single-agent engine operating through iterative `Plan → Act → Observe → Reflect` loops directly in your project workspace.
+- **Prime Agent Harness**: Dynamic multi-agent coordinator that decomposes complex goals into specialist tasks, executes independent read-only tasks concurrently, serializes edits, and synthesizes results.
+- **Unified Agent Picker**: Interactive card-based harness selector when creating new agent sessions, with distinct indicators for autonomous and multi-agent workflows.
+- **Sandboxed Tool Runtime**: Bounded tool execution with symlink resolution, workspace boundary enforcement, and risk-tiered user confirmations for sensitive operations.
+- **Fx Agent & ACP Server Fixes**: Resolved ACP `initialize` startup error handling and credential fallback when offline or in restricted network environments.
+- **EasyCLIProxyAPI Integration**: Seamless configuration, discovery, caching, and model management for external OpenAI-compatible gateways.
+- **Complete Offline Runtime**: Retains the complete embedded MLX and MLX-VLM Python stack on Apple Silicon with deterministic Release pruning.
 
 ## Community build security notice
 
-`Playa-0.3.4-macos-arm64-unnotarized.dmg` is ad-hoc signed and **not notarized by Apple**. The ad-hoc signature protects code integrity but does not verify the publisher's identity. macOS Gatekeeper may block the first launch.
+`Playa-0.3.5-macos-arm64-unnotarized.dmg` is ad-hoc signed and **not notarized by Apple**. The ad-hoc signature protects code integrity but does not verify the publisher's identity. macOS Gatekeeper may block the first launch.
 
 Only download the DMG from the official GitHub release and verify its SHA-256 checksum. After copying Playa to `/Applications`, Control-click the app and choose **Open**. If macOS still blocks it, open **System Settings → Privacy & Security** and choose **Open Anyway** for Playa.
 
-A future build signed with a Developer ID Application certificate and accepted by Apple notarization will support the standard macOS launch flow.
-
 ## Requirements
 
-- Apple Silicon Mac
-- macOS 26 or newer
-- Sufficient disk space and unified memory for the selected models
-
-Provider credentials, Apple signing identities, certificates, notarization credentials, and private update keys are intentionally excluded from the repository and release assets.
+- Apple Silicon Mac (M1/M2/M3/M4)
+- macOS 14.0 or newer
+- Sufficient disk space and unified memory for selected models
